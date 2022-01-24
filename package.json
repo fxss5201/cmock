@@ -1,0 +1,43 @@
+{
+  "name": "spinning-web-mock",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon",
+    "create": "cross-env create=true nodemon",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "port": "8888",
+  "proxy": [
+    {
+      "url": "/api",
+      "target": "http://localhost:8880"
+    }
+  ],
+  "needParams": [
+    "processCode",
+    "currentPage",
+    "pageSize"
+  ],
+  "mockFolder": "controllers",
+  "author": "fxss",
+  "license": "ISC",
+  "dependencies": {
+    "blueimp-md5": "^2.18.0",
+    "chalk": "^4.1.1",
+    "dayjs": "^1.10.7",
+    "http-proxy-middleware": "^2.0.1",
+    "koa": "^2.13.1",
+    "koa-bodyparser": "^4.3.0",
+    "koa-router": "^10.0.0",
+    "koa2-connect": "^1.0.2",
+    "koa2-cors": "^2.0.6",
+    "mockjs": "^1.1.0",
+    "nodemon": "^2.0.7",
+    "qs": "^6.10.3"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3"
+  }
+}
