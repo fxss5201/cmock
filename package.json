@@ -16,7 +16,6 @@
     }
   ],
   "needParams": [
-    "processCode",
     "currentPage",
     "pageSize"
   ],

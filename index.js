@@ -10,6 +10,7 @@ const global = require("./global.js").global;
 
 const app = new Koa();
 
+// 用于写入文件时拼接的文件地址
 const fullpath = path.join(`${__dirname}\\${mockFolder}`);
 
 // 判断文件夹是否存在，不存在则创建
@@ -22,14 +23,12 @@ fs.stat(`./${mockFolder}`, (err, stat) => {
     });
   }
 
-  const controller = require("./controller");
-
   // 全局公共变量及方法
   app.context.global = global;
 
   app.use(cors());
 
-  // log request URL:
+  // 接口访问是打印
   app.use(async (ctx, next) => {
     console.log(
       chalk.blue(`Process ${ctx.request.method} ${ctx.request.url}...`)
@@ -37,13 +36,14 @@ fs.stat(`./${mockFolder}`, (err, stat) => {
     await next();
   });
 
+  // cross-env 设置环境变量 create ，以此来区分是否用于创建 mock 文件
   if (process.env.create) {
     const { createProxyMiddleware } = require("http-proxy-middleware");
     const k2c = require("koa2-connect");
     const { onProxyReqFn, onProxyResFn } = require("./util/onProxy.js");
 
+    // 配置多个代理
     proxy.forEach((item) => {
-      // 创建 mock 文档
       app.use(async (ctx, next) => {
         if (ctx.url.startsWith(item.url)) {
           ctx.respond = false;
@@ -63,6 +63,8 @@ fs.stat(`./${mockFolder}`, (err, stat) => {
     // parse request body:
     app.use(bodyParser());
   } else {
+    const controller = require("./controller");
+
     // parse request body:
     app.use(bodyParser());
 

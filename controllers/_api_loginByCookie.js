@@ -3,8 +3,8 @@ module.exports = {
   url: "/api/loginByCookie",
   method: "POST",
   type: "application/json, text/plain, */*",
-  createTime: "2022-01-24 20:23:35",
-  updateTime: "2022-01-24 20:23:35",
+  createTime: "2022-01-25 13:51:32",
+  updateTime: "2022-01-25 13:51:32",
   bodyKey: {},
   body: { default: { user: {} } },
 };
