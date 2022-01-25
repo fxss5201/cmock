@@ -24,7 +24,7 @@ npm run dev
 
 本项目原理如下图所示：
 
-![schematic-diagram](./schematic-diagram.png)
+![cmock原理图](https://img.fxss.work/article-164303624400033-production.png)
 
 ## 生成 mock
 
