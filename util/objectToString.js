@@ -1,5 +1,5 @@
 /**
- * 讲对象转换成字符串
+ * 将对象转换成字符串
  * @param {object} object 需要被转换的对象
  * @param {array} keys 保留的key
  * @returns {string}
