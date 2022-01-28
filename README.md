@@ -42,11 +42,11 @@ npm run dev
     }
   ],
   "needParams": [
-    "processCode",
     "currentPage",
     "pageSize"
   ],
   "mockFolder": "controllers",
+  "timeout": 0,
 }
 ```
 
@@ -78,6 +78,10 @@ body: { 接口参数: 接口数据, default: 无参数时对应的接口数据 }
 #### mockFolder
 
 mockFolder mock文件存放的目录，尽量不要修改。
+
+#### timeout
+
+timeout 用于统一设置 mock 接收到请求多长时间返回数据，用于前端 loading 状态的联调。单个 mock 文件中也有个 timeout ，优先级大于统一设置的 timeout 。
 
 #### 生成 mock 时的 nodemon.json
 
@@ -122,3 +126,59 @@ mock 服务时，我们可能有时候会修改 mock 文件，但不想每次重
   "watch": ["index.js", "controller.js", "global.js", "./controllers/*" "./util/*"]
 }
 ```
+
+### mock 文件
+
+```js
+/**
+ * 用于生成 mock 文件的模板
+ {
+    name: "$name", // 接口名称
+    url: "$url", // 接口的 url
+    method: "$method", // 接口方法
+    type: "$type", // 接口对应的 response.type
+    createTime: "$createTime", // mock 文件创建时间
+    updateTime: "$updateTime", // mock 文件最后更新时间，如果手动更新 mock 文件，改时间可能不准确
+    isUseMockjs: false, // 是否使用 mockjs 生成返回的数据，需要在 body 中配置 mockTemplate 
+    timeout: 0, // 多久时间返回数据，用于模拟等待时间，方便前端加加载状态
+    bodyKey: {}, // 内部使用，误删
+    body: { // 用于存放接口数据结构
+      接口参数（仅包含 package.json needParams 中配置的参数）: 接口数据结构
+      mockTemplate // 用于 mock.js 生成数据
+    },
+  }
+ */
+module.exports = {
+  template: `module.exports = {
+    name: "$name", // 接口描述
+    url: "$url",
+    method: "$method",
+    type: "$type",
+    createTime: "$createTime",
+    updateTime: "$updateTime",
+    isUseMockjs: false,
+    timeout: 0,
+    bodyKey: {},
+    body: {},
+  }`,
+};
+```
+
+mockTemplate 示例如下：
+
+```js
+mockTemplate: {
+  "list|10": [
+    {
+      "id|+1": 0,
+      title: "@ctitle",
+      description: "@cword(100)",
+      time: "@datetime('yyyy-MM-dd HH:mm:ss')",
+      author: "@cname",
+    },
+  ],
+  total: 100,
+}
+```
+
+[Mock.js文档](http://mockjs.com/)
