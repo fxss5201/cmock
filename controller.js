@@ -3,6 +3,7 @@
 const fs = require("fs");
 const path = require("path");
 const chalk = require("chalk");
+const Mock = require("mockjs");
 const { needParams } = require("./package.json");
 const objectToString = require("./util/objectToString.js");
 
@@ -108,7 +109,11 @@ function createRouter(mapping) {
     }
 
     ctx.response.type = mapping.type;
-    ctx.response.body = mapping.body[bodyKey];
+    if (!mapping.isUseMockjs) {
+      ctx.response.body = mapping.body[bodyKey];
+    } else {
+      ctx.response.body = Mock.mock(mapping.body.mockTemplate);
+    }
     next();
   };
 }

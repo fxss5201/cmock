@@ -7,9 +7,11 @@
     type: "$type", // 接口对应的 response.type
     createTime: "$createTime", // mock 文件创建时间
     updateTime: "$updateTime", // mock 文件最后更新时间，如果手动更新 mock 文件，改时间可能不准确
+    isUseMockjs: false, // 是否使用 mockjs 生成返回的数据，需要在 body 中配置 mockTemplate 
     bodyKey: {}, // 内部使用，误删
-    body: { // 用于存放接口数据结构，后续会添加 mockTemplate ，用于 mock.js 生成数据
+    body: { // 用于存放接口数据结构
       接口参数（仅包含 package.json needParams 中配置的参数）: 接口数据结构
+      mockTemplate // 用于 mock.js 生成数据
     },
   }
  */
@@ -21,6 +23,7 @@ module.exports = {
     type: "$type",
     createTime: "$createTime",
     updateTime: "$updateTime",
+    isUseMockjs: false,
     bodyKey: {},
     body: {},
   }`,

@@ -5,6 +5,7 @@ module.exports = {
   type: "application/json, text/plain, */*",
   createTime: "2022-01-25 13:51:32",
   updateTime: "2022-01-25 13:51:44",
+  isUseMockjs: true,
   bodyKey: {},
   body: {
     currentPage1pageSize5: {
@@ -273,6 +274,18 @@ module.exports = {
             "每想里条住易结备看个间土育面已变半类片收厂。要参性究军置确联示斯有程。没路向眼美高亲深设有四它律安用。利型边本三干数他格各细西九林。大称少性工前连天各议置角强来西。者机传而个养明实结使角命去中。以快较联王位天细重近经水声。",
           time: "1976-06-28 03:42:42",
           author: "苏勇",
+        },
+      ],
+      total: 100,
+    },
+    mockTemplate: {
+      "list|10": [
+        {
+          "id|+1": 0,
+          title: "@ctitle",
+          description: "@cword(100)",
+          time: "@datetime('yyyy-MM-dd HH:mm:ss')",
+          author: "@cname",
         },
       ],
       total: 100,
