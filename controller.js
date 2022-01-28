@@ -89,31 +89,41 @@ function addMapping(router, mapping) {
  */
 function createRouter(mapping) {
   return async (ctx, next) => {
-    // 收集请求参数，得出 body 中的参数 key
-    let paramsBody = Object.assign({}, ctx.params, ctx.query, ctx.request.body);
-    let paramsKeyList = Object.keys(paramsBody);
-    let needParamsKeys = [];
-    let bodyKey = "default";
-    paramsKeyList.forEach((item) => {
-      if (needParams.includes(item)) {
-        needParamsKeys.push(item);
-      }
-    });
-    if (needParamsKeys.length) {
-      bodyKey = objectToString(paramsBody, needParamsKeys);
-    }
-    // 判断 mock 文件的 body 中是否存在请求参数 key，如果不存在，则默认引用第一个
-    const mappingBodyKeys = Object.keys(mapping.body);
-    if (!mappingBodyKeys.includes(bodyKey) && mappingBodyKeys.length) {
-      bodyKey = mappingBodyKeys[0];
-    }
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        if (!mapping.isUseMockjs) {
+          // 收集请求参数，得出 body 中的参数 key
+          let paramsBody = Object.assign(
+            {},
+            ctx.params,
+            ctx.query,
+            ctx.request.body
+          );
+          let paramsKeyList = Object.keys(paramsBody);
+          let needParamsKeys = [];
+          let bodyKey = "default";
+          paramsKeyList.forEach((item) => {
+            if (needParams.includes(item)) {
+              needParamsKeys.push(item);
+            }
+          });
+          if (needParamsKeys.length) {
+            bodyKey = objectToString(paramsBody, needParamsKeys);
+          }
+          // 判断 mock 文件的 body 中是否存在请求参数 key，如果不存在，则默认引用第一个
+          const mappingBodyKeys = Object.keys(mapping.body);
+          if (!mappingBodyKeys.includes(bodyKey) && mappingBodyKeys.length) {
+            bodyKey = mappingBodyKeys[0];
+          }
 
-    ctx.response.type = mapping.type;
-    if (!mapping.isUseMockjs) {
-      ctx.response.body = mapping.body[bodyKey];
-    } else {
-      ctx.response.body = Mock.mock(mapping.body.mockTemplate);
-    }
+          ctx.response.type = mapping.type;
+          ctx.response.body = mapping.body[bodyKey];
+        } else {
+          ctx.response.body = Mock.mock(mapping.body.mockTemplate);
+        }
+        resolve();
+      }, mapping.timeout || 0);
+    });
     next();
   };
 }

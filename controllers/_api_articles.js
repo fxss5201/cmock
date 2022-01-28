@@ -6,6 +6,7 @@ module.exports = {
   createTime: "2022-01-25 13:51:32",
   updateTime: "2022-01-25 13:51:44",
   isUseMockjs: true,
+  timeout: 5000,
   bodyKey: {},
   body: {
     currentPage1pageSize5: {
