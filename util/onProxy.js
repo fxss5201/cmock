@@ -13,13 +13,12 @@ function onProxyReqFn(fullpath) {
     // 生成特殊标识，并 setHeader ，保证同一请求多次触发时能正确匹配
     let headerFlag = `headerFlag${parseInt(Math.random() * 100000000000)}`;
     proxyReq.setHeader("headerFlag", headerFlag);
-
     // 接口请求链接转换为文件名
     const fileNameUrl = `${replaceAll("/", "_", req.url)}`;
     let fileName = fileNameUrl;
     let url = req.url;
     // get请求特殊处理
-    if (req.method.toLowerCase() === "get") {
+    if (req.method.toLowerCase() === "get" || fileName.indexOf("?") > -1) {
       fileName = fileNameUrl.split("?")[0];
       url = url.split("?")[0];
     }
@@ -119,7 +118,7 @@ function onProxyResFn(fullpath) {
     // 根据 url 获取 mock 文件名
     const fileNameUrl = `${replaceAll("/", "_", req.url)}`;
     let fileName = fileNameUrl;
-    if (req.method.toLowerCase() === "get") {
+    if (req.method.toLowerCase() === "get" || fileName.indexOf("?") > -1) {
       fileName = fileNameUrl.split("?")[0];
     }
 
