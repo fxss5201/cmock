@@ -182,3 +182,11 @@ mockTemplate: {
 ```
 
 [Mock.js文档](http://mockjs.com/)
+
+## 命令行生成 mock 文件
+
+在本项目下执行 `npm link` 创建 cmock 软链接。
+
+在 cmock 项目下执行 `cmock add` 按照提示进行 mock 文件添加，需要注意的是 **命令行生成的 mock 文件名称是由接口地址转化的**。
+
+在 cmock 项目下执行 `cmock delete` 按照提示进行 mock 文件删除。

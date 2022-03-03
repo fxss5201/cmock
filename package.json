@@ -8,7 +8,7 @@
     "create": "cross-env create=true nodemon",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "port": "8888",
+  "port": "8889",
   "proxy": [
     {
       "url": "/api",
@@ -21,13 +21,18 @@
   ],
   "mockFolder": "controllers",
   "timeout": 0,
+  "bin": {
+    "cmock": "./bin/index.js"
+  },
   "author": "fxss",
   "license": "ISC",
   "dependencies": {
     "blueimp-md5": "^2.18.0",
     "chalk": "^4.1.1",
+    "commander": "^9.0.0",
     "dayjs": "^1.10.7",
     "http-proxy-middleware": "^2.0.1",
+    "inquirer": "^8.2.0",
     "koa": "^2.13.1",
     "koa-bodyparser": "^4.3.0",
     "koa-router": "^10.0.0",
