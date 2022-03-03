@@ -189,4 +189,6 @@ mockTemplate: {
 
 在 cmock 项目下执行 `cmock add` 按照提示进行 mock 文件添加，需要注意的是 **命令行生成的 mock 文件名称是由接口地址转化的**。
 
+>当前由于 inquirer 的 editor 传入数据结构有解析问题，所以暂时需要等mock文件创建好之后自行将数据结构复制粘贴进去（如有知道解决办法，请帮忙指出）。
+
 在 cmock 项目下执行 `cmock delete` 按照提示进行 mock 文件删除。
