@@ -5,8 +5,8 @@ module.exports = {
   type: "application/json, text/plain, */*",
   createTime: "2022-01-25 13:51:32",
   updateTime: "2022-02-17 16:12:46",
-  isUseMockjs: true,
-  timeout: 5000,
+  isUseMockjs: false,
+  timeout: 0,
   bodyKey: {},
   body: {
     mockTemplate: {

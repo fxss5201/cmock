@@ -6,9 +6,9 @@ const chalk = require("chalk");
 const fs = require("fs");
 const path = require("path");
 const dayjs = require("dayjs");
-const replaceAll = require("./../util/replaceAll");
 const { mockFolder } = require("../package.json");
-const { logSuccess, logError } = require("./../util/common");
+const replaceAll = require("./../util/replaceAll.js");
+const { logSuccess, logError } = require("./../util/common.js");
 
 program
   .version("1.0.0", "-v, --version")

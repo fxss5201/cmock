@@ -4,8 +4,10 @@ const path = require("path");
 const fs = require("fs");
 const bodyParser = require("koa-bodyparser");
 const cors = require("koa2-cors");
+const dayjs = require("dayjs");
 
 const { port, proxy, mockFolder } = require("./package.json");
+const { logInfo } = require("./util/common.js");
 const global = require("./global.js").global;
 
 const app = new Koa();
@@ -28,7 +30,11 @@ fs.stat(`./${mockFolder}`, (err, stat) => {
   // 接口访问是打印
   app.use(async (ctx, next) => {
     console.log(
-      chalk.blue(`Process ${ctx.request.method} ${ctx.request.url}...`)
+      logInfo,
+      chalk.blue(
+        `请求：${chalk.yellow(ctx.request.method)} ${ctx.request.url}`
+      ),
+      dayjs().format("YYYY-MM-DD HH:mm:ss")
     );
     await next();
   });
@@ -66,7 +72,7 @@ fs.stat(`./${mockFolder}`, (err, stat) => {
     app.use(bodyParser());
 
     // add mocks:
-    app.use(controller(mockFolder));
+    app.use(controller());
   }
 });
 

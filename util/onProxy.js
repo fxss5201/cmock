@@ -7,7 +7,7 @@ const replaceAll = require("./replaceAll.js");
 const template = require("./template.js").template;
 const { mockFolder, needParams } = require("../package.json");
 const objectToString = require("./objectToString.js");
-const { logSuccess, logError } = require("./common");
+const { logSuccess, logError } = require("./common.js");
 
 // https://github.com/chimurai/http-proxy-middleware#http-proxy-events
 function onProxyReqFn() {

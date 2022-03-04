@@ -6,14 +6,15 @@ const chalk = require("chalk");
 const Mock = require("mockjs");
 const { needParams, timeout } = require("./package.json");
 const objectToString = require("./util/objectToString.js");
+const { logInfo, logSuccess, logError } = require("./util/common.js");
+const { mockFolder } = require("./package.json");
 
 /**
  * addMocks
  * @param {Object} router require('koa-router')()
- * @param {String} dir path
  */
-function addMocks(router, dir) {
-  const fullpath = path.join(__dirname + "/" + dir);
+function addMocks(router) {
+  const fullpath = path.join(process.cwd(), mockFolder);
   listFile(router, fullpath);
 }
 
@@ -26,68 +27,74 @@ function listFile(router, dirPath) {
   const arr = fs.readdirSync(dirPath);
   arr.forEach(function (item) {
     const fullpath = path.join(dirPath, item);
-    console.log(chalk.blue(`process controller: ${fullpath}...`));
+    console.log(logInfo, chalk.blue(`mock文件: ${fullpath}`));
     const fileContent = require(fullpath);
-    addRouters(router, fileContent);
+    addRouters(router, fileContent, fullpath);
   });
 }
 
 /**
  * add url-route in /mocks:
  * @param {Object} router require('koa-router')()
- * @param {Object} fileContent require(__dirname + '/' + dir + '/' + f)
+ * @param {Object} fileContent path.join(process.cwd(), mockFolder, file)
+ * @param {String} dirPath path
  */
-function addRouters(router, fileContent) {
+function addRouters(router, fileContent, dirPath) {
   if (fileContent.method.toLowerCase() === "get") {
-    router.get(fileContent.url, createRouter(fileContent));
+    router.get(fileContent.url, createRouter(fileContent, dirPath));
     // 用于打印注册号接口的信息
     console.log(
+      logSuccess,
       chalk.green(
-        `register URL: ${chalk.white(fileContent.name)}： ${chalk.yellow(
-          "get"
-        )} ${fileContent.url}`
+        `注册接口： ${chalk.white(fileContent.name)}: ${chalk.yellow("get")} ${
+          fileContent.url
+        }`
       )
     );
   } else if (fileContent.method.toLowerCase() === "post") {
-    router.post(fileContent.url, createRouter(fileContent));
+    router.post(fileContent.url, createRouter(fileContent, dirPath));
     // 用于打印注册号接口的信息
     console.log(
+      logSuccess,
       chalk.green(
-        `register URL: ${chalk.white(fileContent.name)}： ${chalk.yellow(
-          "post"
-        )} ${fileContent.url}`
+        `注册接口： ${chalk.white(fileContent.name)}: ${chalk.yellow("post")} ${
+          fileContent.url
+        }`
       )
     );
   } else if (fileContent.method.toLowerCase() === "put") {
-    router.put(fileContent.url, createRouter(fileContent));
+    router.put(fileContent.url, createRouter(fileContent, dirPath));
     // 用于打印注册号接口的信息
     console.log(
+      logSuccess,
       chalk.green(
-        `register URL: ${chalk.white(fileContent.name)}： ${chalk.yellow(
-          "put"
-        )} ${fileContent.url}`
+        `注册接口： ${chalk.white(fileContent.name)}: ${chalk.yellow("put")} ${
+          fileContent.url
+        }`
       )
     );
   } else if (fileContent.method.toLowerCase() === "delete") {
-    router.del(fileContent.url, createRouter(fileContent));
+    router.del(fileContent.url, createRouter(fileContent, dirPath));
     // 用于打印注册号接口的信息
     console.log(
+      logSuccess,
       chalk.green(
-        `register URL: ${chalk.white(fileContent.name)}： ${chalk.yellow(
+        `注册接口： ${chalk.white(fileContent.name)}: ${chalk.yellow(
           "delete"
         )} ${fileContent.url}`
       )
     );
   } else {
-    console.log(chalk.red(`invalid URL: ${fileContent.url}`));
+    console.log(logError, chalk.red(`mock文件错误：`), chalk.red(dirPath));
   }
 }
 
 /**
  * 生成路由函数
  * @param {Object} fileContent 对应 mock 文件导出的对象
+ * @param {String} dirPath path
  */
-function createRouter(fileContent) {
+function createRouter(fileContent, dirPath) {
   return async (ctx, next) => {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
@@ -110,14 +117,24 @@ function createRouter(fileContent) {
           if (needParamsKeys.length) {
             bodyKey = objectToString(paramsBody, needParamsKeys);
           }
-          // 判断 mock 文件的 body 中是否存在请求参数 key，如果不存在，则默认引用第一个
-          const mappingBodyKeys = Object.keys(fileContent.body);
-          if (!mappingBodyKeys.includes(bodyKey) && mappingBodyKeys.length) {
-            bodyKey = mappingBodyKeys[0];
+          // 判断 mock 文件的 body 中是否存在请求参数 key，如果不存在，则默认引用第一个（需判断第一个是否是 mockTemplate ）
+          let fileBodyKeys = Object.keys(fileContent.body);
+          fileBodyKeys = fileBodyKeys.filter((x) => x !== "mockTemplate");
+          if (!fileBodyKeys.includes(bodyKey) && fileBodyKeys.length) {
+            bodyKey = fileBodyKeys[0];
+            ctx.response.body = fileContent.body[bodyKey];
+          } else {
+            ctx.response.body = {
+              message: `请在mock文件中添加数据结构：${dirPath}`,
+            };
+            console.log(
+              logError,
+              chalk.red("请在mock文件中添加数据结构："),
+              chalk.red(dirPath)
+            );
           }
 
           ctx.response.type = fileContent.type;
-          ctx.response.body = fileContent.body[bodyKey];
         } else {
           ctx.response.body = Mock.mock(fileContent.body.mockTemplate);
         }
@@ -129,8 +146,7 @@ function createRouter(fileContent) {
 }
 
 module.exports = function (dir) {
-  const mocks_dir = dir || "mocks";
   const router = require("koa-router")();
-  addMocks(router, mocks_dir);
+  addMocks(router);
   return router.routes();
 };
