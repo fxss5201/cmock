@@ -68,7 +68,7 @@ fs.stat(`./${mockFolder}`, (err, stat) => {
     // parse request body:
     app.use(bodyParser());
 
-    // add controllers:
+    // add mocks:
     app.use(controller(mockFolder));
   }
 });

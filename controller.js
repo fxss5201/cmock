@@ -8,11 +8,11 @@ const { needParams, timeout } = require("./package.json");
 const objectToString = require("./util/objectToString.js");
 
 /**
- * addControllers
+ * addMocks
  * @param {Object} router require('koa-router')()
  * @param {String} dir path
  */
-function addControllers(router, dir) {
+function addMocks(router, dir) {
   const fullpath = path.join(__dirname + "/" + dir);
   listFile(router, fullpath);
 }
@@ -33,7 +33,7 @@ function listFile(router, dirPath) {
 }
 
 /**
- * add url-route in /controllers:
+ * add url-route in /mocks:
  * @param {Object} router require('koa-router')()
  * @param {Object} fileContent require(__dirname + '/' + dir + '/' + f)
  */
@@ -129,8 +129,8 @@ function createRouter(fileContent) {
 }
 
 module.exports = function (dir) {
-  const controllers_dir = dir || "controllers";
+  const mocks_dir = dir || "mocks";
   const router = require("koa-router")();
-  addControllers(router, controllers_dir);
+  addMocks(router, mocks_dir);
   return router.routes();
 };

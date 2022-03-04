@@ -19,7 +19,7 @@
     "currentPage",
     "pageSize"
   ],
-  "mockFolder": "controllers",
+  "mockFolder": "mocks",
   "timeout": 0,
   "bin": {
     "cmock": "./bin/index.js"

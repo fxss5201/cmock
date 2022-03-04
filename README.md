@@ -45,7 +45,7 @@ npm run dev
     "currentPage",
     "pageSize"
   ],
-  "mockFolder": "controllers",
+  "mockFolder": "mocks",
   "timeout": 0,
 }
 ```
@@ -123,7 +123,7 @@ mock 服务时，我们可能有时候会修改 mock 文件，但不想每次重
 
 ```js
 {
-  "watch": ["index.js", "controller.js", "global.js", "./controllers/*" "./util/*"]
+  "watch": ["index.js", "controller.js", "global.js", "./mocks/*" "./util/*"]
 }
 ```
 
