@@ -47,6 +47,7 @@ npm run dev
   ],
   "mockFolder": "mocks",
   "timeout": 0,
+  "language": "zh-cn",
 }
 ```
 
@@ -82,6 +83,10 @@ mockFolder mock文件存放的目录，尽量不要修改。
 #### timeout
 
 timeout 用于统一设置 mock 接收到请求多长时间返回数据，用于前端 loading 状态的联调。单个 mock 文件中也有个 timeout ，优先级大于统一设置的 timeout 。
+
+#### language
+
+language 用于设置语言，参数值为 `language` 文件夹下对应语言的文件名称。
 
 #### 生成 mock 时的 nodemon.json
 

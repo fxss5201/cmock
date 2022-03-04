@@ -21,6 +21,7 @@
   ],
   "mockFolder": "mocks",
   "timeout": 0,
+  "language": "zh-cn",
   "bin": {
     "cmock": "./bin/index.js"
   },

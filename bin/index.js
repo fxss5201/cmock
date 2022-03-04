@@ -6,9 +6,11 @@ const chalk = require("chalk");
 const fs = require("fs");
 const path = require("path");
 const dayjs = require("dayjs");
-const { mockFolder } = require("../package.json");
+const { mockFolder, language } = require("../package.json");
 const replaceAll = require("./../util/replaceAll.js");
 const { logSuccess, logError } = require("./../util/common.js");
+
+const languageObject = require(`./../language/${language}.js`);
 
 program
   .version("1.0.0", "-v, --version")
@@ -19,10 +21,10 @@ program
         {
           name: "url",
           type: "input",
-          message: "请输入接口路径：",
+          message: languageObject.addUrl,
           validate: (value) => {
             if (value === "") {
-              console.log(logError, chalk.red("请输入接口路径"));
+              console.log(logError, chalk.red(languageObject.addUrl));
               return false;
             }
 
@@ -35,7 +37,7 @@ program
                 console.log(
                   logError,
                   chalk.red(fileNameUrl),
-                  chalk.red(` mock文件已存在,可点击链接查看`)
+                  chalk.red(languageObject.addMockFileExistence)
                 );
                 return false;
               }
@@ -47,35 +49,35 @@ program
         {
           name: "name",
           type: "input",
-          message: "请输入接口名称：",
+          message: languageObject.addName,
         },
         {
           name: "method",
           type: "list",
-          message: "请选择接口方法：",
+          message: languageObject.addMethod,
           choices: ["get", "post", "put", "delete"],
           default: "post",
         },
         {
           name: "type",
           type: "list",
-          message: "请选择接口的response.type：",
+          message: languageObject.addType,
           choices: ["application/json", "text/plain"],
           default: "application/json",
         },
         {
           name: "isUseMockjs",
           type: "confirm",
-          message: "是否使用mockjs？：",
+          message: languageObject.addIsUseMockjs,
           default: false,
         },
         {
           name: "timeout",
           type: "number",
-          message: "请输入接口timeout：",
+          message: languageObject.addTimeout,
           validate: (value) => {
             if (!/^[0-9]*$/.test(value)) {
-              console.log(logError, chalk.red("请输入 >= 0 的数字"));
+              console.log(logError, chalk.red(languageObject.addTimeoutError));
               return false;
             }
             return true;
@@ -85,11 +87,11 @@ program
         // {
         //   name: "body",
         //   type: "editor",
-        //   message: "请输入接口数据结构：",
+        //   message: languageObject.addBody,
         //   postfix: "Powershell",
         //   validate: (value) => {
         //     if (!value) {
-        //       console.log(logError, chalk.red("请输入接口数据结构"));
+        //       console.log(logError, chalk.red(languageObject.addBody));
         //       return false;
         //     }
         //     return true;
@@ -140,7 +142,7 @@ program
             console.log(
               logSuccess,
               chalk.green(fileNameUrl),
-              chalk.green(` 创建成功，暂请点击链接自行粘贴数据结构`)
+              chalk.green(languageObject.addMockFileSuccess)
             );
           }
         );
@@ -153,18 +155,18 @@ program.command("delete").action(() => {
       {
         name: "flag",
         type: "confirm",
-        message: "文件名是否由接口url转换的？",
+        message: languageObject.deleteFlag,
       },
       {
         name: "url",
         type: "input",
-        message: "请输入接口路径：",
+        message: languageObject.deleteUrl,
         when: (answers) => {
           return answers.flag;
         },
         validate: (value) => {
           if (value === "") {
-            console.log(logError, chalk.red("请输入接口路径："));
+            console.log(logError, chalk.red(languageObject.deleteUrl));
             return false;
           }
 
@@ -180,7 +182,7 @@ program.command("delete").action(() => {
             console.log(
               logError,
               chalk.red(fileNameUrl),
-              chalk.red(` mock文件不存在`)
+              chalk.red(languageObject.deleteMockNonExistent)
             );
             return false;
           }
@@ -189,13 +191,13 @@ program.command("delete").action(() => {
       {
         name: "name",
         type: "input",
-        message: "请输入需要删除的mock文件名称：",
+        message: languageObject.deleteName,
         when: (answers) => {
           return !answers.flag;
         },
         validate: (value) => {
           if (value === "") {
-            console.log(logError, chalk.red("请输入需要删除的mock文件名称："));
+            console.log(logError, chalk.red(languageObject.deleteName));
             return false;
           }
           const fileNameUrl = path.join("./..", mockFolder, `${value}.js`);
@@ -209,7 +211,7 @@ program.command("delete").action(() => {
             console.log(
               logError,
               chalk.red(fileNameUrl),
-              chalk.red(` mock文件不存在`)
+              chalk.red(languageObject.deleteMockNonExistent)
             );
             return false;
           }
@@ -230,7 +232,7 @@ program.command("delete").action(() => {
         console.log(
           logSuccess,
           chalk.green(fileNameUrl),
-          chalk.green(` 删除成功`)
+          chalk.green(languageObject.deleteMockSuccess)
         );
       });
     });
