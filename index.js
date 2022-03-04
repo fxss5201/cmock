@@ -18,7 +18,7 @@ fs.stat(`./${mockFolder}`, (err, stat) => {
   if (err) {
     fs.mkdirSync(`./${mockFolder}`, (ierr, istat) => {
       if (ierr) {
-        console.log(chalk.red(`./${mockFolder} 文件夹不存在，并创建失败`));
+        console.log(chalk.red(`./${mockFolder} 文件夹不存在，创建失败`));
       }
     });
   }

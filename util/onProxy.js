@@ -23,10 +23,10 @@ function onProxyReqFn(fullpath) {
       url = url.split("?")[0];
     }
 
-    let fileText;
+    let fileContent;
     // 直接 require 对应的 mock 文件，如果失败则同步创建再 require
     try {
-      fileText = require(`${fullpath}/${fileName}.js`);
+      fileContent = require(`${fullpath}/${fileName}.js`);
     } catch (error) {
       let fileTemplate = template;
       let updateTime = dayjs().format("YYYY-MM-DD HH:mm:ss");
@@ -40,7 +40,7 @@ function onProxyReqFn(fullpath) {
       // http://nodejs.cn/api/fs.html#fsappendfilesyncpath-data-options
       fs.appendFileSync(`./${mockFolder}/${fileName}.js`, fileTemplate);
       console.log(chalk.green(`onProxyReqFn: ${fileName}.js create success`));
-      fileText = require(`${fullpath}/${fileName}.js`);
+      fileContent = require(`${fullpath}/${fileName}.js`);
     }
 
     if (req.method.toLowerCase() !== "get") {
@@ -65,15 +65,15 @@ function onProxyReqFn(fullpath) {
           bodyKey = objectToString(paramsBody, needParamsKeys);
         }
         if (bodyKey.length) {
-          fileText.body[bodyKey] = "";
+          fileContent.body[bodyKey] = "";
         } else {
-          fileText.body.default = "";
+          fileContent.body.default = "";
         }
-        fileText.bodyKey[headerFlag] = bodyKey;
+        fileContent.bodyKey[headerFlag] = bodyKey;
 
         // 将参数 key 一并写入 mock 文件
-        fileText = `module.exports=${JSON.stringify(fileText)}`;
-        fs.writeFile(`${fullpath}\\${fileName}.js`, fileText, (err) => {
+        fileContent = `module.exports=${JSON.stringify(fileContent)}`;
+        fs.writeFile(`${fullpath}\\${fileName}.js`, fileContent, (err) => {
           if (err)
             console.log(chalk.red(`onProxyReqFn: ${fileName}.js ${err}`));
           console.log(chalk.green(`onProxyReqFn: ${fileName}.js save success`));
@@ -94,15 +94,15 @@ function onProxyReqFn(fullpath) {
         bodyKey = objectToString(paramsBody, needParamsKeys);
       }
       if (bodyKey.length) {
-        fileText.body[bodyKey] = "";
+        fileContent.body[bodyKey] = "";
       } else {
-        fileText.body.default = "";
+        fileContent.body.default = "";
       }
-      fileText.bodyKey[headerFlag] = bodyKey;
+      fileContent.bodyKey[headerFlag] = bodyKey;
 
       // 将参数 key 一并写入 mock 文件
-      fileText = `module.exports=${JSON.stringify(fileText)}`;
-      fs.writeFile(`${fullpath}\\${fileName}.js`, fileText, (err) => {
+      fileContent = `module.exports=${JSON.stringify(fileContent)}`;
+      fs.writeFile(`${fullpath}\\${fileName}.js`, fileContent, (err) => {
         if (err) console.log(chalk.red(`onProxyReqFn: ${fileName}.js ${err}`));
         console.log(chalk.green(`onProxyReqFn: ${fileName}.js save success`));
       });
@@ -123,9 +123,9 @@ function onProxyResFn(fullpath) {
     }
 
     // 导入 mock 文件对象，并根据 headerFlag 拿到 body 中的参数 key
-    let fileText = require(`${fullpath}/${fileName}.js`);
-    let key = fileText.bodyKey[headerFlag] || "default";
-    delete fileText.bodyKey[headerFlag];
+    let fileContent = require(`${fullpath}/${fileName}.js`);
+    let key = fileContent.bodyKey[headerFlag] || "default";
+    delete fileContent.bodyKey[headerFlag];
 
     // 获取后端接口返回的数据结构
     let body = [];
@@ -136,16 +136,16 @@ function onProxyResFn(fullpath) {
       body = Buffer.concat(body).toString();
 
       // 将后端接口返回的数据结构添加到 mock 文件的导出对象中
-      if (!fileText.body[key]) {
-        fileText.body[key] = body ? JSON.parse(body) : "";
+      if (!fileContent.body[key]) {
+        fileContent.body[key] = body ? JSON.parse(body) : "";
       }
 
       // 更新时间
-      fileText.updateTime = dayjs().format("YYYY-MM-DD HH:mm:ss");
+      fileContent.updateTime = dayjs().format("YYYY-MM-DD HH:mm:ss");
 
       // 重新写入 mock 完整文件
-      fileText = `module.exports=${JSON.stringify(fileText)}`;
-      fs.writeFile(`${fullpath}\\${fileName}.js`, fileText, (err) => {
+      fileContent = `module.exports=${JSON.stringify(fileContent)}`;
+      fs.writeFile(`${fullpath}\\${fileName}.js`, fileContent, (err) => {
         if (err) console.log(chalk.red(`onProxyResFn: ${fileName}.js ${err}`));
         console.log(chalk.green(`onProxyResFn: ${fileName}.js save success`));
       });

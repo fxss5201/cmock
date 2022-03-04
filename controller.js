@@ -27,71 +27,71 @@ function listFile(router, dirPath) {
   arr.forEach(function (item) {
     const fullpath = path.join(dirPath, item);
     console.log(chalk.blue(`process controller: ${fullpath}...`));
-    const mapping = require(fullpath);
-    addMapping(router, mapping);
+    const fileContent = require(fullpath);
+    addRouters(router, fileContent);
   });
 }
 
 /**
  * add url-route in /controllers:
  * @param {Object} router require('koa-router')()
- * @param {Object} mapping require(__dirname + '/' + dir + '/' + f)
+ * @param {Object} fileContent require(__dirname + '/' + dir + '/' + f)
  */
-function addMapping(router, mapping) {
-  if (mapping.method.toLowerCase() === "get") {
-    router.get(mapping.url, createRouter(mapping));
+function addRouters(router, fileContent) {
+  if (fileContent.method.toLowerCase() === "get") {
+    router.get(fileContent.url, createRouter(fileContent));
     // 用于打印注册号接口的信息
     console.log(
       chalk.green(
-        `register URL mapping: ${chalk.white(mapping.name)}： ${chalk.yellow(
+        `register URL: ${chalk.white(fileContent.name)}： ${chalk.yellow(
           "get"
-        )} ${mapping.url}`
+        )} ${fileContent.url}`
       )
     );
-  } else if (mapping.method.toLowerCase() === "post") {
-    router.post(mapping.url, createRouter(mapping));
+  } else if (fileContent.method.toLowerCase() === "post") {
+    router.post(fileContent.url, createRouter(fileContent));
     // 用于打印注册号接口的信息
     console.log(
       chalk.green(
-        `register URL mapping: ${chalk.white(mapping.name)}： ${chalk.yellow(
+        `register URL: ${chalk.white(fileContent.name)}： ${chalk.yellow(
           "post"
-        )} ${mapping.url}`
+        )} ${fileContent.url}`
       )
     );
-  } else if (mapping.method.toLowerCase() === "put") {
-    router.put(mapping.url, createRouter(mapping));
+  } else if (fileContent.method.toLowerCase() === "put") {
+    router.put(fileContent.url, createRouter(fileContent));
     // 用于打印注册号接口的信息
     console.log(
       chalk.green(
-        `register URL mapping: ${chalk.white(mapping.name)}： ${chalk.yellow(
+        `register URL: ${chalk.white(fileContent.name)}： ${chalk.yellow(
           "put"
-        )} ${mapping.url}`
+        )} ${fileContent.url}`
       )
     );
-  } else if (mapping.method.toLowerCase() === "delete") {
-    router.del(mapping.url, createRouter(mapping));
+  } else if (fileContent.method.toLowerCase() === "delete") {
+    router.del(fileContent.url, createRouter(fileContent));
     // 用于打印注册号接口的信息
     console.log(
       chalk.green(
-        `register URL mapping: ${chalk.white(mapping.name)}： ${chalk.yellow(
+        `register URL: ${chalk.white(fileContent.name)}： ${chalk.yellow(
           "delete"
-        )} ${mapping.url}`
+        )} ${fileContent.url}`
       )
     );
   } else {
-    console.log(chalk.red(`invalid URL: ${mapping.url}`));
+    console.log(chalk.red(`invalid URL: ${fileContent.url}`));
   }
 }
 
 /**
  * 生成路由函数
- * @param {Object} mapping 对应 mock 文件导出的对象
+ * @param {Object} fileContent 对应 mock 文件导出的对象
  */
-function createRouter(mapping) {
+function createRouter(fileContent) {
   return async (ctx, next) => {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
-        if (!mapping.isUseMockjs) {
+        if (!fileContent.isUseMockjs) {
           // 收集请求参数，得出 body 中的参数 key
           let paramsBody = Object.assign(
             {},
@@ -111,18 +111,18 @@ function createRouter(mapping) {
             bodyKey = objectToString(paramsBody, needParamsKeys);
           }
           // 判断 mock 文件的 body 中是否存在请求参数 key，如果不存在，则默认引用第一个
-          const mappingBodyKeys = Object.keys(mapping.body);
+          const mappingBodyKeys = Object.keys(fileContent.body);
           if (!mappingBodyKeys.includes(bodyKey) && mappingBodyKeys.length) {
             bodyKey = mappingBodyKeys[0];
           }
 
-          ctx.response.type = mapping.type;
-          ctx.response.body = mapping.body[bodyKey];
+          ctx.response.type = fileContent.type;
+          ctx.response.body = fileContent.body[bodyKey];
         } else {
-          ctx.response.body = Mock.mock(mapping.body.mockTemplate);
+          ctx.response.body = Mock.mock(fileContent.body.mockTemplate);
         }
         resolve();
-      }, mapping.timeout || timeout || 0);
+      }, fileContent.timeout || timeout || 0);
     });
     next();
   };
