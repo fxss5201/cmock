@@ -4,9 +4,11 @@ const program = require("commander");
 const inquirer = require("inquirer");
 const chalk = require("chalk");
 const fs = require("fs");
+const path = require("path");
 const dayjs = require("dayjs");
 const replaceAll = require("./../util/replaceAll");
 const { mockFolder } = require("../package.json");
+const { logSuccess, logError } = require("./../util/common");
 
 program
   .version("1.0.0", "-v, --version")
@@ -20,19 +22,21 @@ program
           message: "请输入接口路径：",
           validate: (value) => {
             if (value === "") {
-              console.log(chalk.red("✖"), chalk.red("请输入接口路径"));
+              console.log(logError, chalk.red("请输入接口路径"));
               return false;
             }
-            const fileNameUrl = `./../${mockFolder}/${replaceAll(
-              "/",
-              "_",
-              value
-            )}.js`;
+
+            const fileName = `${replaceAll("/", "_", value)}.js`;
+            const fileNameUrl = path.join("../", mockFolder, fileName);
 
             try {
               const mockFileExport = require(fileNameUrl);
               if (mockFileExport) {
-                console.log(chalk.red("✖"), chalk.red("mock文件已存在"));
+                console.log(
+                  logError,
+                  chalk.red(fileNameUrl),
+                  chalk.red(` mock文件已存在,可点击链接查看`)
+                );
                 return false;
               }
             } catch (err) {
@@ -71,7 +75,7 @@ program
           message: "请输入接口timeout：",
           validate: (value) => {
             if (!/^[0-9]*$/.test(value)) {
-              console.log(chalk.red("✖"), chalk.red("请输入 >= 0 的数字"));
+              console.log(logError, chalk.red("请输入 >= 0 的数字"));
               return false;
             }
             return true;
@@ -85,7 +89,7 @@ program
         //   postfix: "Powershell",
         //   validate: (value) => {
         //     if (!value) {
-        //       console.log(chalk.red("✖"), chalk.red("请输入接口数据结构"));
+        //       console.log(logError, chalk.red("请输入接口数据结构"));
         //       return false;
         //     }
         //     return true;
@@ -126,14 +130,19 @@ program
           updateTime: dayjs().format("YYYY-MM-DD HH:mm:ss"),
         };
 
-        const fileNameUrl = `${process.cwd()}\\${mockFolder}\\${replaceAll(
-          "/",
-          "_",
-          answers.url
-        )}.js`;
-        fs.appendFileSync(
+        const fileName = `${replaceAll("/", "_", answers.url)}.js`;
+        const fileNameUrl = path.join(process.cwd(), mockFolder, fileName);
+        fs.appendFile(
           fileNameUrl,
-          `module.exports = ${JSON.stringify(fileContent, null, "\t")}`
+          `module.exports = ${JSON.stringify(fileContent, null, "\t")}`,
+          (err) => {
+            if (err) throw err;
+            console.log(
+              logSuccess,
+              chalk.green(fileNameUrl),
+              chalk.green(` 创建成功，暂请点击链接自行粘贴数据结构`)
+            );
+          }
         );
       });
   });
@@ -155,14 +164,13 @@ program.command("delete").action(() => {
         },
         validate: (value) => {
           if (value === "") {
-            console.log(chalk.red("✖"), chalk.red("请输入接口路径："));
+            console.log(logError, chalk.red("请输入接口路径："));
             return false;
           }
-          const fileNameUrl = `./../${mockFolder}/${replaceAll(
-            "/",
-            "_",
-            value
-          )}.js`;
+
+          const fileName = `${replaceAll("/", "_", value)}.js`;
+          const fileNameUrl = path.join("./../", mockFolder, fileName);
+
           try {
             const mockFileExport = require(fileNameUrl);
             if (mockFileExport) {
@@ -170,8 +178,9 @@ program.command("delete").action(() => {
             }
           } catch (err) {
             console.log(
-              chalk.red("✖"),
-              chalk.red(`mock文件：${replaceAll("/", "_", value)}.js 不存在`)
+              logError,
+              chalk.red(fileNameUrl),
+              chalk.red(` mock文件不存在`)
             );
             return false;
           }
@@ -186,13 +195,10 @@ program.command("delete").action(() => {
         },
         validate: (value) => {
           if (value === "") {
-            console.log(
-              chalk.red("✖"),
-              chalk.red("请输入需要删除的mock文件名称：")
-            );
+            console.log(logError, chalk.red("请输入需要删除的mock文件名称："));
             return false;
           }
-          const fileNameUrl = `./../${mockFolder}/${value}.js`;
+          const fileNameUrl = path.join("./..", mockFolder, `${value}.js`);
 
           try {
             const mockFileExport = require(fileNameUrl);
@@ -201,8 +207,9 @@ program.command("delete").action(() => {
             }
           } catch (err) {
             console.log(
-              chalk.red("✖"),
-              chalk.red(`mock文件：${value}.js 不存在`)
+              logError,
+              chalk.red(fileNameUrl),
+              chalk.red(` mock文件不存在`)
             );
             return false;
           }
@@ -212,15 +219,20 @@ program.command("delete").action(() => {
     .then((answers) => {
       let fileNameUrl = "";
       if (answers.flag) {
-        fileNameUrl = `${process.cwd()}\\${mockFolder}\\${replaceAll(
-          "/",
-          "_",
-          answers.url
-        )}.js`;
+        const fileName = `${replaceAll("/", "_", answers.url)}.js`;
+        fileNameUrl = path.join(process.cwd(), mockFolder, fileName);
       } else {
-        fileNameUrl = `${process.cwd()}\\${mockFolder}\\${answers.name}.js`;
+        const fileName = `${answers.name}.js`;
+        fileNameUrl = path.join(process.cwd(), mockFolder, fileName);
       }
-      fs.rmSync(fileNameUrl);
+      fs.rm(fileNameUrl, (err) => {
+        if (err) throw err;
+        console.log(
+          logSuccess,
+          chalk.green(fileNameUrl),
+          chalk.green(` 删除成功`)
+        );
+      });
     });
 });
 

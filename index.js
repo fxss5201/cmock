@@ -10,9 +10,6 @@ const global = require("./global.js").global;
 
 const app = new Koa();
 
-// 用于写入文件时拼接的文件地址
-const fullpath = path.join(`${__dirname}\\${mockFolder}`);
-
 // 判断文件夹是否存在，不存在则创建
 fs.stat(`./${mockFolder}`, (err, stat) => {
   if (err) {
@@ -51,8 +48,8 @@ fs.stat(`./${mockFolder}`, (err, stat) => {
             createProxyMiddleware({
               target: item.target,
               changeOrigin: true,
-              onProxyReq: onProxyReqFn(fullpath),
-              onProxyRes: onProxyResFn(fullpath),
+              onProxyReq: onProxyReqFn(),
+              onProxyRes: onProxyResFn(),
             })
           )(ctx, next);
         }

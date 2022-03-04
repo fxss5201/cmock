@@ -1,4 +1,5 @@
 const fs = require("fs");
+const path = require("path");
 const chalk = require("chalk");
 const qs = require("qs");
 const dayjs = require("dayjs");
@@ -6,27 +7,29 @@ const replaceAll = require("./replaceAll.js");
 const template = require("./template.js").template;
 const { mockFolder, needParams } = require("../package.json");
 const objectToString = require("./objectToString.js");
+const { logSuccess, logError } = require("./common");
 
 // https://github.com/chimurai/http-proxy-middleware#http-proxy-events
-function onProxyReqFn(fullpath) {
+function onProxyReqFn() {
   return function (proxyReq, req, res) {
     // 生成特殊标识，并 setHeader ，保证同一请求多次触发时能正确匹配
     let headerFlag = `headerFlag${parseInt(Math.random() * 100000000000)}`;
     proxyReq.setHeader("headerFlag", headerFlag);
     // 接口请求链接转换为文件名
-    const fileNameUrl = `${replaceAll("/", "_", req.url)}`;
-    let fileName = fileNameUrl;
+    const requestUrl = `${replaceAll("/", "_", req.url)}`;
+    let fileName = requestUrl;
     let url = req.url;
     // get请求特殊处理
     if (req.method.toLowerCase() === "get" || fileName.indexOf("?") > -1) {
-      fileName = fileNameUrl.split("?")[0];
+      fileName = requestUrl.split("?")[0];
       url = url.split("?")[0];
     }
 
     let fileContent;
+    let fileNameUrl = path.join(process.cwd(), mockFolder, `${fileName}.js`);
     // 直接 require 对应的 mock 文件，如果失败则同步创建再 require
     try {
-      fileContent = require(`${fullpath}/${fileName}.js`);
+      fileContent = require(fileNameUrl);
     } catch (error) {
       let fileTemplate = template;
       let updateTime = dayjs().format("YYYY-MM-DD HH:mm:ss");
@@ -38,9 +41,13 @@ function onProxyReqFn(fullpath) {
       fileTemplate = fileTemplate.replace("$updateTime", updateTime);
 
       // http://nodejs.cn/api/fs.html#fsappendfilesyncpath-data-options
-      fs.appendFileSync(`./${mockFolder}/${fileName}.js`, fileTemplate);
-      console.log(chalk.green(`onProxyReqFn: ${fileName}.js create success`));
-      fileContent = require(`${fullpath}/${fileName}.js`);
+      fs.appendFileSync(fileNameUrl, fileTemplate);
+      console.log(
+        logSuccess,
+        chalk.green(fileNameUrl),
+        chalk.green(` 创建成功`)
+      );
+      fileContent = require(fileNameUrl);
     }
 
     if (req.method.toLowerCase() !== "get") {
@@ -73,15 +80,25 @@ function onProxyReqFn(fullpath) {
 
         // 将参数 key 一并写入 mock 文件
         fileContent = `module.exports=${JSON.stringify(fileContent)}`;
-        fs.writeFile(`${fullpath}\\${fileName}.js`, fileContent, (err) => {
+        fs.writeFile(fileNameUrl, fileContent, (err) => {
           if (err)
-            console.log(chalk.red(`onProxyReqFn: ${fileName}.js ${err}`));
-          console.log(chalk.green(`onProxyReqFn: ${fileName}.js save success`));
+            console.log(
+              logError,
+              chalk.red(`onProxyReqFn: `),
+              chalk.red(fileNameUrl),
+              chalk.red(err)
+            );
+          console.log(
+            logSuccess,
+            chalk.green(`onProxyReqFn: `),
+            chalk.green(fileNameUrl),
+            chalk.green(` 保存成功`)
+          );
         });
       });
     } else {
       // get 请求直接从 url 上获取参数，并使用 qs 将参数字符串转化为对象，之后得到 body 中的参数 key
-      const paramsBody = qs.parse(fileNameUrl.split("?")[1]);
+      const paramsBody = qs.parse(requestUrl.split("?")[1]);
       let paramsKeyList = Object.keys(paramsBody);
       let needParamsKeys = [];
       let bodyKey = "";
@@ -102,28 +119,40 @@ function onProxyReqFn(fullpath) {
 
       // 将参数 key 一并写入 mock 文件
       fileContent = `module.exports=${JSON.stringify(fileContent)}`;
-      fs.writeFile(`${fullpath}\\${fileName}.js`, fileContent, (err) => {
-        if (err) console.log(chalk.red(`onProxyReqFn: ${fileName}.js ${err}`));
-        console.log(chalk.green(`onProxyReqFn: ${fileName}.js save success`));
+      fs.writeFile(fileNameUrl, fileContent, (err) => {
+        if (err)
+          console.log(
+            logError,
+            chalk.red(`onProxyReqFn: `),
+            chalk.red(fileNameUrl),
+            chalk.red(err)
+          );
+        console.log(
+          logSuccess,
+          chalk.green(`onProxyReqFn: `),
+          chalk.green(fileNameUrl),
+          chalk.green(` 保存成功`)
+        );
       });
     }
   };
 }
 
-function onProxyResFn(fullpath) {
+function onProxyResFn() {
   return function (proxyRes, req, res) {
     // 获取 onProxyReqFn 中设置的标识
     let headerFlag = proxyRes.req._header.match(/(?<=headerFlag: )(.*)\r\n/)[1];
 
     // 根据 url 获取 mock 文件名
-    const fileNameUrl = `${replaceAll("/", "_", req.url)}`;
-    let fileName = fileNameUrl;
+    const requestUrl = `${replaceAll("/", "_", req.url)}`;
+    let fileName = requestUrl;
     if (req.method.toLowerCase() === "get" || fileName.indexOf("?") > -1) {
-      fileName = fileNameUrl.split("?")[0];
+      fileName = requestUrl.split("?")[0];
     }
 
+    let fileNameUrl = path.join(process.cwd(), mockFolder, `${fileName}.js`);
+    let fileContent = require(fileNameUrl);
     // 导入 mock 文件对象，并根据 headerFlag 拿到 body 中的参数 key
-    let fileContent = require(`${fullpath}/${fileName}.js`);
     let key = fileContent.bodyKey[headerFlag] || "default";
     delete fileContent.bodyKey[headerFlag];
 
@@ -145,9 +174,20 @@ function onProxyResFn(fullpath) {
 
       // 重新写入 mock 完整文件
       fileContent = `module.exports=${JSON.stringify(fileContent)}`;
-      fs.writeFile(`${fullpath}\\${fileName}.js`, fileContent, (err) => {
-        if (err) console.log(chalk.red(`onProxyResFn: ${fileName}.js ${err}`));
-        console.log(chalk.green(`onProxyResFn: ${fileName}.js save success`));
+      fs.writeFile(fileNameUrl, fileContent, (err) => {
+        if (err)
+          console.log(
+            logError,
+            chalk.red(`onProxyResFn: `),
+            chalk.red(fileNameUrl),
+            chalk.red(err)
+          );
+        console.log(
+          logSuccess,
+          chalk.green(`onProxyResFn: `),
+          chalk.green(fileNameUrl),
+          chalk.green(` 保存成功`)
+        );
       });
       res.end();
     });
