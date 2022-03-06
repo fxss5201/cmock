@@ -23,4 +23,12 @@ module.exports = {
   deleteMockNonExistent: " Mock file does not exist",
   deleteName: "Please enter the name of the mock file to be deleted:",
   deleteMockSuccess: " Deleted successfully",
+
+  controllerMockFile: "Mock file:",
+  controllerRegister: "Registered interface:",
+  controllerMockFileError: "Mock file error:",
+  controllerMockFileBody: "Please add data structure to mock file:",
+
+  proxyCreateSuccess: " Created successfully",
+  proxySaveSuccess: " Saved successfully"
 };

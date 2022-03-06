@@ -1,71 +1,71 @@
 {
-  "name": "cmock",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "dev": "nodemon",
-    "create": "cross-env create=true nodemon",
-    "commit": "git cz",
-    "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "port": "8889",
-  "proxy": [
-    {
-      "url": "/api",
-      "target": "http://localhost:8880"
-    }
-  ],
-  "needParams": [
-    "currentPage",
-    "pageSize"
-  ],
-  "mockFolder": "mocks",
-  "timeout": 0,
-  "language": "zh-cn",
-  "bin": {
-    "cmock": "./bin/index.js"
-  },
-  "author": "fxss",
-  "license": "ISC",
-  "dependencies": {
-    "blueimp-md5": "^2.18.0",
-    "chalk": "^4.1.1",
-    "commander": "^9.0.0",
-    "dayjs": "^1.10.7",
-    "http-proxy-middleware": "^2.0.1",
-    "inquirer": "^8.2.0",
-    "koa": "^2.13.1",
-    "koa-bodyparser": "^4.3.0",
-    "koa-router": "^10.0.0",
-    "koa2-connect": "^1.0.2",
-    "koa2-cors": "^2.0.6",
-    "mockjs": "^1.1.0",
-    "nodemon": "^2.0.7",
-    "qs": "^6.10.3"
-  },
-  "devDependencies": {
-    "@commitlint/cli": "^16.2.1",
-    "@commitlint/config-conventional": "^16.2.1",
-    "commitizen": "^4.2.4",
-    "conventional-changelog-cli": "^2.2.2",
-    "cross-env": "^7.0.3",
-    "cz-conventional-changelog": "^3.3.0"
-  },
-  "commitlint": {
-    "extends": [
-      "@commitlint/config-conventional"
-    ]
-  },
-  "config": {
-    "commitizen": {
-      "path": "./node_modules/cz-conventional-changelog"
-    }
-  },
-  "husky": {
-    "hooks": {
-      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
-    }
-  }
+	"name": "cmock",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"dev": "nodemon",
+		"create": "cross-env create=true nodemon",
+		"commit": "git cz",
+		"changelog": "conventional-changelog -p angular -i CHANGELOG.md -s",
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"port": "8889",
+	"proxy": [
+		{
+			"url": "/api",
+			"target": "http://localhost:8880"
+		}
+	],
+	"needParams": [
+		"currentPage",
+		"pageSize"
+	],
+	"mockFolder": "mocks",
+	"timeout": 0,
+	"language": "zh-cn",
+	"bin": {
+		"cmock": "./bin/index.js"
+	},
+	"author": "fxss",
+	"license": "ISC",
+	"dependencies": {
+		"blueimp-md5": "^2.18.0",
+		"chalk": "^4.1.1",
+		"commander": "^9.0.0",
+		"dayjs": "^1.10.7",
+		"http-proxy-middleware": "^2.0.1",
+		"inquirer": "^8.2.0",
+		"koa": "^2.13.1",
+		"koa-bodyparser": "^4.3.0",
+		"koa-router": "^10.0.0",
+		"koa2-connect": "^1.0.2",
+		"koa2-cors": "^2.0.6",
+		"mockjs": "^1.1.0",
+		"nodemon": "^2.0.7",
+		"qs": "^6.10.3"
+	},
+	"devDependencies": {
+		"@commitlint/cli": "^16.2.1",
+		"@commitlint/config-conventional": "^16.2.1",
+		"commitizen": "^4.2.4",
+		"conventional-changelog-cli": "^2.2.2",
+		"cross-env": "^7.0.3",
+		"cz-conventional-changelog": "^3.3.0"
+	},
+	"commitlint": {
+		"extends": [
+			"@commitlint/config-conventional"
+		]
+	},
+	"config": {
+		"commitizen": {
+			"path": "./node_modules/cz-conventional-changelog"
+		}
+	},
+	"husky": {
+		"hooks": {
+			"commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+		}
+	}
 }

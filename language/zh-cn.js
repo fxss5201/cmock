@@ -21,4 +21,12 @@ module.exports = {
   deleteMockNonExistent: " mock文件不存在",
   deleteName: "请输入需要删除的mock文件名称：",
   deleteMockSuccess: " 删除成功",
+
+  controllerMockFile: "mock 文件：",
+  controllerRegister: "注册接口：",
+  controllerMockFileError: "mock文件错误：",
+  controllerMockFileBody: "请在mock文件中添加数据结构：",
+
+  proxyCreateSuccess: " 创建成功",
+  proxySaveSuccess: " 保存成功"
 };

@@ -4,10 +4,11 @@ const fs = require("fs");
 const path = require("path");
 const chalk = require("chalk");
 const Mock = require("mockjs");
-const { needParams, timeout } = require("./package.json");
+const { needParams, timeout, language } = require("./package.json");
 const objectToString = require("./util/objectToString.js");
 const { logInfo, logSuccess, logError } = require("./util/common.js");
 const { mockFolder } = require("./package.json");
+const languageObject = require(`./language/${language}.js`);
 
 /**
  * addMocks
@@ -27,7 +28,7 @@ function listFile(router, dirPath) {
   const arr = fs.readdirSync(dirPath);
   arr.forEach(function (item) {
     const fullpath = path.join(dirPath, item);
-    console.log(logInfo, chalk.blue(`mock文件: ${fullpath}`));
+    console.log(logInfo, chalk.blue(`${languageObject.controllerMockFile} ${fullpath}`));
     const fileContent = require(fullpath);
     addRouters(router, fileContent, fullpath);
   });
@@ -46,7 +47,7 @@ function addRouters(router, fileContent, dirPath) {
     console.log(
       logSuccess,
       chalk.green(
-        `注册接口： ${chalk.white(fileContent.name)}: ${chalk.yellow("get")} ${
+        `${languageObject.controllerRegister} ${chalk.white(fileContent.name)}: ${chalk.yellow("get")} ${
           fileContent.url
         }`
       )
@@ -57,7 +58,7 @@ function addRouters(router, fileContent, dirPath) {
     console.log(
       logSuccess,
       chalk.green(
-        `注册接口： ${chalk.white(fileContent.name)}: ${chalk.yellow("post")} ${
+        `${languageObject.controllerRegister} ${chalk.white(fileContent.name)}: ${chalk.yellow("post")} ${
           fileContent.url
         }`
       )
@@ -68,7 +69,7 @@ function addRouters(router, fileContent, dirPath) {
     console.log(
       logSuccess,
       chalk.green(
-        `注册接口： ${chalk.white(fileContent.name)}: ${chalk.yellow("put")} ${
+        `${languageObject.controllerRegister} ${chalk.white(fileContent.name)}: ${chalk.yellow("put")} ${
           fileContent.url
         }`
       )
@@ -79,13 +80,13 @@ function addRouters(router, fileContent, dirPath) {
     console.log(
       logSuccess,
       chalk.green(
-        `注册接口： ${chalk.white(fileContent.name)}: ${chalk.yellow(
+        `${languageObject.controllerRegister} ${chalk.white(fileContent.name)}: ${chalk.yellow(
           "delete"
         )} ${fileContent.url}`
       )
     );
   } else {
-    console.log(logError, chalk.red(`mock文件错误：`), chalk.red(dirPath));
+    console.log(logError, chalk.red(`${languageObject.controllerMockFileError}`), chalk.red(dirPath));
   }
 }
 
@@ -125,11 +126,11 @@ function createRouter(fileContent, dirPath) {
             ctx.response.body = fileContent.body[bodyKey];
           } else {
             ctx.response.body = {
-              message: `请在mock文件中添加数据结构：${dirPath}`,
+              message: `${languageObject.controllerMockFileBody} ${dirPath}`,
             };
             console.log(
               logError,
-              chalk.red("请在mock文件中添加数据结构："),
+              chalk.red(`${languageObject.controllerMockFileBody}`),
               chalk.red(dirPath)
             );
           }

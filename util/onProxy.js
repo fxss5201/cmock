@@ -5,9 +5,10 @@ const qs = require("qs");
 const dayjs = require("dayjs");
 const replaceAll = require("./replaceAll.js");
 const template = require("./template.js").template;
-const { mockFolder, needParams } = require("../package.json");
+const { mockFolder, needParams, language } = require("../package.json");
 const objectToString = require("./objectToString.js");
 const { logSuccess, logError } = require("./common.js");
+const languageObject = require(`../language/${language}.js`);
 
 // https://github.com/chimurai/http-proxy-middleware#http-proxy-events
 function onProxyReqFn() {
@@ -45,7 +46,7 @@ function onProxyReqFn() {
       console.log(
         logSuccess,
         chalk.green(fileNameUrl),
-        chalk.green(` 创建成功`)
+        chalk.green(`${languageObject.proxyCreateSuccess}`)
       );
       fileContent = require(fileNameUrl);
     }
@@ -92,7 +93,7 @@ function onProxyReqFn() {
             logSuccess,
             chalk.green(`onProxyReqFn: `),
             chalk.green(fileNameUrl),
-            chalk.green(` 保存成功`)
+            chalk.green(`${languageObject.proxySaveSuccess}`)
           );
         });
       });
@@ -131,7 +132,7 @@ function onProxyReqFn() {
           logSuccess,
           chalk.green(`onProxyReqFn: `),
           chalk.green(fileNameUrl),
-          chalk.green(` 保存成功`)
+          chalk.green(`${languageObject.proxySaveSuccess}`)
         );
       });
     }
@@ -186,7 +187,7 @@ function onProxyResFn() {
           logSuccess,
           chalk.green(`onProxyResFn: `),
           chalk.green(fileNameUrl),
-          chalk.green(` 保存成功`)
+          chalk.green(`${languageObject.proxySaveSuccess}`)
         );
       });
       res.end();
