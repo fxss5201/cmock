@@ -1,4 +1,11 @@
 module.exports = {
+  commandAuthor: "Author information",
+  commandGithub: "Project address",
+  commandLanguage: "Switch language command",
+  switchLanguage: "Please select the language you want to use:",
+  switchLanguageSuccess: "The switch is successful. Please restart the service",
+  commandAdd: "Add mock file command",
+  commandDelete: "Delete mock file command",
   addUrl: "Please enter the interface path:",
   addMockFileExistence:
     " Mock file already exists, you can click the link to view it",

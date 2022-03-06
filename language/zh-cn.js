@@ -1,4 +1,11 @@
 module.exports = {
+  commandAuthor: "作者信息",
+  commandGithub: "项目地址",
+  commandLanguage: "切换语言命令",
+  switchLanguage: "请选择需要使用的语言：",
+  switchLanguageSuccess: "切换成功，请重启服务",
+  commandAdd: "新增mock文件命令",
+  commandDelete: "删除mock文件命令",
   addUrl: "请输入接口路径：",
   addMockFileExistence: " mock文件已存在,可点击链接查看",
   addName: "请输入接口名称：",
