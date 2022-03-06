@@ -1,5 +1,7 @@
 # cmock
 
+[中文文档](https://github.com/fxss5201/cmock/blob/main/README_zh-cn.md).
+
 ## Introduction to cmock
 
 Cmock is used to automatically generate a mock file according to the interface and start a mock service according to the mock file.
