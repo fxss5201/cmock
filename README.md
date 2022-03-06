@@ -1,36 +1,58 @@
 # cmock
 
-## cmock 简介
+## Introduction to cmock
 
-cmock 用于根据接口自动生成 mock 文件，并根据 mock 文件起 mock 服务。
+Cmock is used to automatically generate a mock file according to the interface and start a mock service according to the mock file.
 
-## 前言
+## Preface
 
-搭建 cmock 的缘由是因为项目前后端分离之后，在联调接口前，前后端协商接口数据结构，前端即可根据数据结构来进行数据 mock ，但后端接口一变更，前端又需要维护新的 mock 数据结构，无疑会增加维护成本，所以如果能根据接口自动生成 mock 文件，一是可以降低 mock 的维护成本，二是可以快速生成以前老的接口的数据结构。
+The reason for building cmock is that after the front and rear ends of the project are separated, the front and rear ends negotiate the interface data structure before the joint commissioning interface, and the front end can mock the data according to the data structure. However, once the back-end interface is changed, the front end needs to maintain a new mock data structure, which will undoubtedly increase the maintenance cost. Therefore, if the mock file can be automatically generated according to the interface, First, it can reduce the maintenance cost of mock. Second, it can quickly generate the data structure of the old interface.
 
-## 快速开始
+## Quick start
 
 ```
 npm install
 
-// 创建 mock 文件
+// Create mock file
 npm run create
 
-// 起 mock 服务
+// Start mock service
 npm run dev
 ```
 
-## 原理分析
+## 命令行
 
-本项目原理如下图所示：
+Execute `npm link` under this project to create cmock soft link.
 
-![cmock原理图](https://img.fxss.work/article-164303624400033-production.png)
+This project supports multiple languages. Language files are stored in the root directory `language` folder and configured in `package.json` file `language` field, you can use the command line `cmock language` / `cmock lang` to switch languages.
 
-## 生成 mock
+Execute `cmock add` / `cmock a` under the cmock project, follow the prompts to add a mock file, It should be noted that **The mock file name generated from the command line is converted by the interface address**, for example, the interface address is `/api/list` , then the mock file name is `_api_list.js`.
 
-### 生成 mock 前的配置
+>At present, there is a problem in parsing the data structure passed in by the editor of the inquirer, so you need to copy and paste the data structure after the mock file is created (If you know the solution, please help point out).
 
-本项目的配置放置于 package.json 文件，主要配置项如下：
+Execute `cmock delete` / `cmock d` under the cmock project, follow the prompts to delete a mock file.
+
+All command lines:
+
+| command line | function |
+|----|----|
+| `cmock add` / `cmock a` | Add mock file |
+| `cmock delete` / `cmock d` | Delete mock file |
+| `cmock language` / `cmock lang` | Switch language |
+| `cmock author` | Author GitHub information |
+| `cmock github` | Project GitHub address |
+
+## Principle analysis
+
+The principle of the project is shown in the figure below:
+
+![Schematic diagram of cmock](https://img.fxss.work/article-164303624400033-production.png)
+
+## Generate mock
+
+### Configuration before generating mock
+
+The configuration of this project is placed in `package.json` file. The main configuration items are as follows:
 
 ```js
 {
@@ -53,44 +75,44 @@ npm run dev
 
 #### port
 
-port 用于设置服务监听的接口。
+port: Used to set the interface for service listening.
 
 #### proxy
 
-proxy 用于设置代理配置，和 https://cli.vuejs.org/zh/config/#devserver-proxy 配置类似，采用的是 [http-proxy-middleware](https://github.com/chimurai/http-proxy-middleware) 进行代理：
+proxy: Used to set agent configuration, And https://cli.vuejs.org/zh/config/#devserver-proxy the proxy configuration is similar, the agent is [http-proxy-middleware](https://github.com/chimurai/http-proxy-middleware) ：
 
 ```js
 "proxy": [
   {
-    "url": "/api", // 设置接口匹配
-    "target": "http://localhost:8880" // 需要代理到的接口地方
+    "url": "/api",
+    "target": "http://localhost:8880"
   }
 ]
 ```
 
 #### needParams
 
-needParams 需要保留的接口字段，本项目支持全局设置需要保留的接口字段，当接口参数中包含 needParams 中的参数时，会将数据保存为：
+needParams: Interface fields to be reserved. This project supports global setting of interface fields to be reserved. When the interface parameters include the parameters in needparams, the data will be saved as:
 
 ```js
-body: { 接口参数: 接口数据, default: 无参数时对应的接口数据 },
+body: { Interface parameters: Interface data, default: Corresponding interface data without parameters },
 ```
 
 #### mockFolder
 
-mockFolder mock文件存放的目录，尽量不要修改。
+mockFolder: The directory where mock files are stored. Try not to modify them.
 
 #### timeout
 
-timeout 用于统一设置 mock 接收到请求多长时间返回数据，用于前端 loading 状态的联调。单个 mock 文件中也有个 timeout ，优先级大于统一设置的 timeout 。
+timeout: It is used to uniformly set how long the mock receives the request to return data, and is used for the joint debugging of the front-end loading status. There is also a timeout in a single mock file, and the priority is higher than the uniformly set timeout.
 
 #### language
 
-language 用于设置语言，参数值为 `language` 文件夹下对应语言的文件名称。
+language: It is used to set the language. The parameter value is the file name of the corresponding language under the `language` folder. Generally, the command line `cmock language` / `cmock lang` can be used to switch the language.
 
-#### 生成 mock 时的 nodemon.json
+#### When generating mock, `nodemon.json`:
 
-生成 mock 文件的时候需要保证配置的 watch 不包含 mock 文件存放的目录，否则生成文件的时候，一直重启服务，导致生成的 mock 文件有误。
+When generating a mock file, you need to ensure that the configured watch does not contain the directory where the mock file is stored. Otherwise, when generating a file, the service will be restarted all the time, resulting in an error in the generated mock file.
 
 ```js
 {
@@ -98,16 +120,16 @@ language 用于设置语言，参数值为 `language` 文件夹下对应语言�
 }
 ```
 
-### 生成 mock 详细步骤
+### Detailed steps of generating mock
 
-执行 `npm run create` ，并将前端请求执行 cmock ，如 vue 项目可在 vue.config.js 文件中配置代理：
+Execute `npm run create` , the front end requests to execute cmock. For example, Vue items can be displayed in `vue.config.js` file:
 
 ```js
 module.exports = {
   devServer: {
     proxy: {
       "/api": {
-        target: "http://localhost:8888", // 指向 cmock 服务
+        target: "http://localhost:8888",
         ws: true,
         changeOrigin: true
       }
@@ -116,15 +138,15 @@ module.exports = {
 }
 ```
 
-然后将前端页面打开，调所有的接口，这个时候会自动生成 mock 文件。
+Then open the front-end page and call all interfaces. At this time, the mock file will be automatically generated.
 
-## mock 服务
+## Mock service
 
-执行 `npm run dev` 起服务，会根据前端请求返回对应的 mock 文件中的数据。
+Execute `npm run dev`, return the data in the corresponding mock file according to the front-end request.
 
-### mock 服务时的 nodemon.json
+### When mocking service, `nodemon.json`:
 
-mock 服务时，我们可能有时候会修改 mock 文件，但不想每次重启服务，则需要把 mock 文件配置到 nodemon.json 中的 watch 中。
+We may modify the mock file sometimes when we use the mock service, but if we don't want to restart the service every time, we need to configure the mock file to `nodemon.json`.
 
 ```js
 {
@@ -132,30 +154,30 @@ mock 服务时，我们可能有时候会修改 mock 文件，但不想每次重
 }
 ```
 
-### mock 文件
+### Mock file
 
 ```js
 /**
- * 用于生成 mock 文件的模板
+ * Template for generating mock files
  {
-    name: "$name", // 接口名称
-    url: "$url", // 接口的 url
-    method: "$method", // 接口方法
-    type: "$type", // 接口对应的 response.type
-    createTime: "$createTime", // mock 文件创建时间
-    updateTime: "$updateTime", // mock 文件最后更新时间，如果手动更新 mock 文件，改时间可能不准确
-    isUseMockjs: false, // 是否使用 mockjs 生成返回的数据，需要在 body 中配置 mockTemplate 
-    timeout: 0, // 多久时间返回数据，用于模拟等待时间，方便前端加加载状态
-    bodyKey: {}, // 内部使用，误删
-    body: { // 用于存放接口数据结构
-      接口参数（仅包含 package.json needParams 中配置的参数）: 接口数据结构
-      mockTemplate // 用于 mock.js 生成数据
+    name: "$name", // Interface name
+    url: "$url", // URL of the interface
+    method: "$method", // Interface method
+    type: "$type", // The response corresponding to the interface type
+    createTime: "$createTime", // Mock file creation time
+    updateTime: "$updateTime", // The last update time of the mock file. If you manually update the mock file, the change time may be inaccurate
+    isUseMockjs: false, // To generate the returned data using mockjs, you need to configure mocktemplate in the body
+    timeout: 0, // How long to return data is used to simulate the waiting time to facilitate the loading state of the front end
+    bodyKey: {}, // Internal use, mistakenly deleted
+    body: { // Used to store interface data structure
+      Interface parameters (only including the parameters configured in package.json needparams): interface data structure,
+      mockTemplate // For mock JS generate data
     },
   }
  */
 module.exports = {
   template: `module.exports = {
-    name: "$name", // 接口描述
+    name: "$name",
     url: "$url",
     method: "$method",
     type: "$type",
@@ -169,7 +191,7 @@ module.exports = {
 };
 ```
 
-mockTemplate 示例如下：
+mockTemplate examples are as follows:
 
 ```js
 mockTemplate: {
@@ -186,14 +208,4 @@ mockTemplate: {
 }
 ```
 
-[Mock.js文档](http://mockjs.com/)
-
-## 命令行生成 mock 文件
-
-在本项目下执行 `npm link` 创建 cmock 软链接。
-
-在 cmock 项目下执行 `cmock add` 按照提示进行 mock 文件添加，需要注意的是 **命令行生成的 mock 文件名称是由接口地址转化的**。
-
->当前由于 inquirer 的 editor 传入数据结构有解析问题，所以暂时需要等mock文件创建好之后自行将数据结构复制粘贴进去（如有知道解决办法，请帮忙指出）。
-
-在 cmock 项目下执行 `cmock delete` 按照提示进行 mock 文件删除。
+[Mock.js document](https://github.com/nuysoft/Mock)
