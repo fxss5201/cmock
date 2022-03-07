@@ -48,7 +48,7 @@ All command lines:
 
 The principle of the project is shown in the figure below:
 
-![Schematic diagram of cmock](https://img.fxss.work/article-164303624400033-production.png)
+![Schematic diagram of cmock](https://img.fxss.work/article-164662170300088-production.png)
 
 ## Generate mock
 
