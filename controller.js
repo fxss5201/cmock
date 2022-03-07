@@ -28,7 +28,10 @@ function listFile(router, dirPath) {
   const arr = fs.readdirSync(dirPath);
   arr.forEach(function (item) {
     const fullpath = path.join(dirPath, item);
-    console.log(logInfo, chalk.blue(`${languageObject.controllerMockFile} ${fullpath}`));
+    console.log(
+      logInfo,
+      chalk.blue(`${languageObject.controllerMockFile} ${fullpath}`)
+    );
     const fileContent = require(fullpath);
     addRouters(router, fileContent, fullpath);
   });
@@ -47,9 +50,9 @@ function addRouters(router, fileContent, dirPath) {
     console.log(
       logSuccess,
       chalk.green(
-        `${languageObject.controllerRegister} ${chalk.white(fileContent.name)}: ${chalk.yellow("get")} ${
-          fileContent.url
-        }`
+        `${languageObject.controllerRegister} ${chalk.white(
+          fileContent.name
+        )}: ${chalk.yellow("get")} ${fileContent.url}`
       )
     );
   } else if (fileContent.method.toLowerCase() === "post") {
@@ -58,9 +61,9 @@ function addRouters(router, fileContent, dirPath) {
     console.log(
       logSuccess,
       chalk.green(
-        `${languageObject.controllerRegister} ${chalk.white(fileContent.name)}: ${chalk.yellow("post")} ${
-          fileContent.url
-        }`
+        `${languageObject.controllerRegister} ${chalk.white(
+          fileContent.name
+        )}: ${chalk.yellow("post")} ${fileContent.url}`
       )
     );
   } else if (fileContent.method.toLowerCase() === "put") {
@@ -69,9 +72,9 @@ function addRouters(router, fileContent, dirPath) {
     console.log(
       logSuccess,
       chalk.green(
-        `${languageObject.controllerRegister} ${chalk.white(fileContent.name)}: ${chalk.yellow("put")} ${
-          fileContent.url
-        }`
+        `${languageObject.controllerRegister} ${chalk.white(
+          fileContent.name
+        )}: ${chalk.yellow("put")} ${fileContent.url}`
       )
     );
   } else if (fileContent.method.toLowerCase() === "delete") {
@@ -80,13 +83,17 @@ function addRouters(router, fileContent, dirPath) {
     console.log(
       logSuccess,
       chalk.green(
-        `${languageObject.controllerRegister} ${chalk.white(fileContent.name)}: ${chalk.yellow(
-          "delete"
-        )} ${fileContent.url}`
+        `${languageObject.controllerRegister} ${chalk.white(
+          fileContent.name
+        )}: ${chalk.yellow("delete")} ${fileContent.url}`
       )
     );
   } else {
-    console.log(logError, chalk.red(`${languageObject.controllerMockFileError}`), chalk.red(dirPath));
+    console.log(
+      logError,
+      chalk.red(`${languageObject.controllerMockFileError}`),
+      chalk.red(dirPath)
+    );
   }
 }
 
@@ -121,8 +128,10 @@ function createRouter(fileContent, dirPath) {
           // 判断 mock 文件的 body 中是否存在请求参数 key，如果不存在，则默认引用第一个（需判断第一个是否是 mockTemplate ）
           let fileBodyKeys = Object.keys(fileContent.body);
           fileBodyKeys = fileBodyKeys.filter((x) => x !== "mockTemplate");
-          if (!fileBodyKeys.includes(bodyKey) && fileBodyKeys.length) {
-            bodyKey = fileBodyKeys[0];
+          if (fileBodyKeys.length) {
+            if (!fileBodyKeys.includes(bodyKey)) {
+              bodyKey = fileBodyKeys[0];
+            }
             ctx.response.body = fileContent.body[bodyKey];
           } else {
             ctx.response.body = {

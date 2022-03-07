@@ -6,7 +6,8 @@ const bodyParser = require("koa-bodyparser");
 const cors = require("koa2-cors");
 const dayjs = require("dayjs");
 
-const { port, proxy, mockFolder } = require("./package.json");
+const { port, proxy, mockFolder, language } = require("./package.json");
+const languageObject = require(`./language/${language}.js`);
 const { logInfo } = require("./util/common.js");
 const global = require("./global.js").global;
 
@@ -32,7 +33,9 @@ fs.stat(`./${mockFolder}`, (err, stat) => {
     console.log(
       logInfo,
       chalk.blue(
-        `请求：${chalk.yellow(ctx.request.method)} ${ctx.request.url}`
+        `${languageObject.allConsole} ${chalk.yellow(ctx.request.method)} ${
+          ctx.request.url
+        }`
       ),
       dayjs().format("YYYY-MM-DD HH:mm:ss")
     );
