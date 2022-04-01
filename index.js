@@ -5,6 +5,7 @@ const fs = require("fs");
 const bodyParser = require("koa-bodyparser");
 const cors = require("koa2-cors");
 const dayjs = require("dayjs");
+const createSocketCmock = require("./util/socket");
 
 const { port, proxy, mockFolder, language } = require("./package.json");
 const languageObject = require(`./language/${language}.js`);
@@ -76,6 +77,8 @@ fs.stat(`./${mockFolder}`, (err, stat) => {
 
     // add mocks:
     app.use(controller());
+
+    createSocketCmock();
   }
 });
 

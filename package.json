@@ -10,7 +10,8 @@
 		"changelog": "conventional-changelog -p angular -i CHANGELOG.md -s",
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
-	"port": "8889",
+	"port": "8888",
+	"socketPort": "8889",
 	"proxy": [
 		{
 			"url": "/api",
@@ -43,7 +44,8 @@
 		"koa2-cors": "^2.0.6",
 		"mockjs": "^1.1.0",
 		"nodemon": "^2.0.7",
-		"qs": "^6.10.3"
+		"qs": "^6.10.3",
+		"socket.io": "^4.4.1"
 	},
 	"devDependencies": {
 		"@commitlint/cli": "^16.2.1",

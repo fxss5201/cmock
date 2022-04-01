@@ -1,0 +1,44 @@
+// https://sass.bootcss.com/documentation/at-rules/forward
+@forward 'element-plus/theme-chalk/src/common/var.scss';
+
+.ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@mixin clearfix {
+  $selector: &;
+
+  @at-root {
+    #{$selector}::before,
+    #{$selector}::after {
+      display: table;
+      content: "";
+    }
+    #{$selector}::after {
+      clear: both;
+    }
+  }
+}
+
+.row {
+  @include clearfix;
+}
+
+.flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.height-all {
+  height: 100%;
+}
+
+.border-bottom {
+  border-bottom: 1px solid var(--el-border-color);
+}
+.border-top {
+  border-top: 1px solid var(--el-border-color);
+}
