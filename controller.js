@@ -118,7 +118,9 @@ function createRouter(fileContent, dirPath) {
           let needParamsKeys = [];
           let bodyKey = "default";
           paramsKeyList.forEach((item) => {
-            if (needParams.includes(item)) {
+            if (needParams.length && needParams.includes(item)) {
+              needParamsKeys.push(item);
+            } else {
               needParamsKeys.push(item);
             }
           });

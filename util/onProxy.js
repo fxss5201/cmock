@@ -65,7 +65,9 @@ function onProxyReqFn() {
         let needParamsKeys = [];
         let bodyKey = "";
         paramsKeyList.forEach((item) => {
-          if (needParams.includes(item)) {
+          if (needParams.length && needParams.includes(item)) {
+            needParamsKeys.push(item);
+          } else {
             needParamsKeys.push(item);
           }
         });
@@ -104,7 +106,9 @@ function onProxyReqFn() {
       let needParamsKeys = [];
       let bodyKey = "";
       paramsKeyList.forEach((item) => {
-        if (needParams.includes(item)) {
+        if (needParams.length && needParams.includes(item)) {
+          needParamsKeys.push(item);
+        } else {
           needParamsKeys.push(item);
         }
       });
