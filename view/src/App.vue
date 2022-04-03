@@ -2,7 +2,7 @@
   <el-config-provider :locale="locale">
     <el-container>
       <el-header class="border-bottom">
-        <page-header></page-header>
+        <page-header ref="pageHeaderComponent"></page-header>
       </el-header>
       <el-container>
         <el-aside width="200px" class="page-aside-style">
@@ -20,16 +20,23 @@
 </template>
 
 <script setup lang="ts">
-import { reactive  } from 'vue'
+import { reactive, ref  } from 'vue'
 import { useStore } from './store'
 import zhCn from 'element-plus/es/locale/lang/zh-cn'
 import socket from './plugins/socket'
 
 const locale = reactive(zhCn)
 const store = useStore()
+const pageHeaderComponent = ref(null)
 socket.on("updateMocks", (mocksFiles) => {
   console.log(mocksFiles)
+  mocksFiles.forEach((item: { body: { [x: string]: any } }) => {
+    Object.keys(item.body).forEach(key => {
+      item.body[key] = JSON.stringify(item.body[key])
+    })
+  })
   store.commit('setMocksFiles', mocksFiles)
+  pageHeaderComponent.value && pageHeaderComponent.value.closeEvent()
 })
 </script>
 

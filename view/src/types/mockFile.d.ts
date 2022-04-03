@@ -1,7 +1,6 @@
 export interface mockFileModel {
   fileName: string
   filePath: string
-  fileAllPath: string
   name: string
   url: string
   method: string

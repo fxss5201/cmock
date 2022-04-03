@@ -10,12 +10,14 @@
         placeholder="请输入搜索内容"
         @select="handleSelect"
       />
+      <el-button :icon="Plus" @click="addMockEvent" class="mgl12">新增接口</el-button>
     </div>
   </div>
+  <mock-form-dialog :show="dialogVisible" @close="closeEvent"></mock-form-dialog>
 </template>
 
 <script setup lang="ts">
-import { Search } from '@element-plus/icons-vue'
+import { Search, Plus } from '@element-plus/icons-vue'
 import { computed, ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useStore } from './../store'
@@ -25,6 +27,16 @@ const router = useRouter()
 const route = useRoute()
 const store = useStore()
 
+const dialogVisible = ref(false)
+defineExpose({
+  closeEvent
+})
+function addMockEvent() {
+  dialogVisible.value = true
+}
+function closeEvent() {
+  dialogVisible.value = false
+}
 const goHomeEvent = () => {
   router.push({ path: '/home' })
 }
@@ -34,8 +46,7 @@ const mockList = computed((): mockItemModel[] => {
     return {
       fileName: item.fileName,
       name: item.name,
-      url: item.url,
-      fileAllPath: item.fileAllPath
+      url: item.url
     }
   })
 })
@@ -45,18 +56,15 @@ const searchList = computed((): searchItemModel[] => {
   mockList.value.forEach(item => {
     res.push({
       value: item.fileName,
-      path: item.fileName,
-      fileAllPath: item.fileAllPath
+      path: item.fileName
     })
     res.push({
       value: item.name,
-      path: item.fileName,
-      fileAllPath: item.fileAllPath
+      path: item.fileName
     })
     res.push({
       value: item.url,
-      path: item.fileName,
-      fileAllPath: item.fileAllPath
+      path: item.fileName
     })
   })
   return res
@@ -87,5 +95,9 @@ const handleSelect = (item: searchItemModel) => {
 .page-name {
   font-size: 26px;
   cursor: pointer;
+}
+.menu-nav {
+  display: flex;
+  align-items: center;
 }
 </style>

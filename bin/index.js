@@ -53,6 +53,13 @@ program
           name: "name",
           type: "input",
           message: languageObject.addName,
+          validate: (value) => {
+            if (value === "") {
+              console.log(logError, chalk.red(languageObject.addName));
+              return false;
+            }
+            return true;
+          }
         },
         {
           name: "method",

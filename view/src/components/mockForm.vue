@@ -7,7 +7,7 @@
       <el-input v-model="form.url" placeholder="请输入接口 url" clearable />
     </el-form-item>
     <el-form-item prop="method" label="接口方法">
-      <el-select v-model="form.method" placeholder="请选择接口方法" clearable>
+      <el-select v-model="form.method" placeholder="请选择接口方法" clearable @change="methodChangeEvent">
         <el-option v-for="item in methodList" :key="item" :label="item" :value="item" />
       </el-select>
     </el-form-item>
@@ -20,7 +20,8 @@
     <el-form-item prop="isUseMockjs" label="是否使用mockjs">
       <el-switch v-model="form.isUseMockjs" @change="isUseMockjsChangeEvent" />
     </el-form-item>
-    <el-form-item prop="body" label="是否使用mockjs">
+    <el-form-item prop="body" label="body">
+      <el-alert title="表格中的 key 和 body 需要使用 JSON.parse ，所以请使用严格 JSON 格式" show-icon :closable="false" type="warning" />
       <el-table :data="tableData" border style="width: 100%">
         <el-table-column label="操作" align="center" width="80">
           <template #default="scope">
@@ -29,12 +30,12 @@
         </el-table-column>
         <el-table-column prop="key" label="参数" width="240">
           <template #default="scope">
-            <el-input v-model="scope.row.key" :rows="2" type="textarea" autosize :placeholder="`请输入参数，例如${keyPlaceholder}`" />
+            <el-input v-model="scope.row.key" :rows="2" type="textarea" :autosize="{ minRows: 2, maxRows: 6 }" :disabled="scope.row.disabled" :placeholder="`请输入参数，例如${keyPlaceholder}`" />
           </template>
         </el-table-column>
         <el-table-column prop="body" label="返回数据">
           <template #default="scope">
-            <el-input v-model="scope.row.body" :rows="2" type="textarea" autosize placeholder="请输入返回数据" />
+            <el-input v-model="scope.row.body" :rows="2" type="textarea" :autosize="{ minRows: 2, maxRows: 6 }" placeholder="请输入返回数据" />
           </template>
         </el-table-column>
       </el-table>
@@ -43,21 +44,45 @@
       </div>
     </el-form-item>
     <el-form-item>
-      <el-button @click="saveMockFormEvent(ruleFormRef)">保存接口</el-button>
+      <el-button @click="saveMockFormEvent(ruleFormRef)">{{ isEditor ? '更新接口' : '保存接口' }}</el-button>
+      <el-button v-if="isEditor" @click="deleteMockFormEvent">删除接口</el-button>
     </el-form-item>
   </el-form>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, watch } from 'vue'
+import { ref, reactive, computed, watch, PropType } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { Delete, Plus } from '@element-plus/icons-vue'
 import type { FormInstance } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { mockFormModel, mockBodyModel } from './../types'
+import socket from './../plugins/socket'
+import { useStore } from './../store'
+import { propKey } from 'element-plus/es/utils'
+
+const props = defineProps({
+  isEditor: {
+    type: Boolean,
+    default: false
+  },
+  mockContent: {
+    type: Object as PropType<mockFormModel>,
+    default: () => {}
+  }
+})
+
+const router = useRouter()
+const route = useRoute()
+const store = useStore()
 
 const ruleFormRef = ref<FormInstance>()
 const loading = ref(false)
 const methodList = ['get', 'post', 'put', 'delete']
-const form = reactive<mockFormModel>({
+let tableData = reactive<mockBodyModel[]>([])
+let form = reactive<mockFormModel>({
+  fileName: '',
+  filePath: '',
   name: '',
   url: '',
   method: '',
@@ -67,6 +92,17 @@ const form = reactive<mockFormModel>({
   bodyKey: {},
   body: {},
 })
+watch(
+  () => props.mockContent,
+  (mockContent) => {
+    Object.assign(form, mockContent)
+    bodyKeyToTable()
+  },
+  {
+    immediate: true,
+    deep: true
+  }
+)
 const keyPlaceholder = computed(() => {
   return form.method === 'get' ? 'limit=10&page=1&justOriginal=false&order=0' : '{"from":"/detail/46#arrayprototypeunshift","to":"/","client":1}'
 })
@@ -85,39 +121,59 @@ const rules = reactive({
     { required: true, message: '请选择接口 type', trigger: 'blur' },
   ]
 })
-let tableData = reactive<mockBodyModel[]>([])
-watch(
-  () => form.body,
-  (body) => {
-    tableData = []
-    Object.keys(body).forEach(item => {
-      tableData.push({
-        key: item,
-        body: body[item]
+function bodyKeyToTable() {
+  tableData.splice(0, tableData.length)
+  Object.keys(form.body).forEach(item => {
+    let bodyKey
+    if (form.method === 'get') {
+      bodyKey = item.replaceAll('___', '&')
+      bodyKey = bodyKey.replaceAll('_', '=')
+    } else {
+      let bodyKeyObj: { [propName: string]: string } = {}
+      let list: any = item.split('___')
+      list = list.map((x: string) => x.split('_'))
+      list.forEach((xList: string[]) => {
+        bodyKeyObj[xList[0]] = xList[1]
       })
+      bodyKey = JSON.stringify(bodyKeyObj)
+    }
+    tableData.push({
+      key: bodyKey,
+      body: form.body[item],
+      disabled: item === 'mockTemplate' ? true : false
     })
-  }
-)
-const addBodyEvent = () => {
-  tableData.push({
-    key: '',
-    body: ''
   })
 }
-const deleteBodyEvent = (scope: any) => {
+function addBodyEvent() {
+  tableData.push({
+    key: '',
+    body: '',
+    disabled: false
+  })
+}
+function deleteBodyEvent(scope: any) {
   tableData.splice(scope.$index, 1)
 }
-const isUseMockjsChangeEvent = (val: any) => {
+function methodChangeEvent(val: any) {
+  tableData.forEach(item => {
+    if (!item.disabled) {
+      item.key = ''
+    }
+  })
+}
+function isUseMockjsChangeEvent(val: any) {
   if (val) {
     tableData.unshift({
       key: 'mockTemplate',
-      body: ''
+      body: '',
+      disabled: true
     })
   } else {
-    tableData.shift()
+    let index = tableData.findIndex(x => x.disabled)
+    tableData.splice(index, 1)
   }
 }
-const keyToBodyKey = (key: string) => {
+function keyToBodyKey(key: string) {
   let res = ''
   if (form.method === 'get') {
     res = key.replaceAll('=', '_')
@@ -132,26 +188,82 @@ const keyToBodyKey = (key: string) => {
   }
   return res
 }
-const tableToObject = () => {
+function tableToObject() {
   let res: {[propName: string]: any} = {}
   tableData.forEach(item => {
     res[keyToBodyKey(item.key)] = JSON.parse(item.body)
   })
   return res
 }
+function tableDataRequired() {
+  let res = true
+  for (let i = 0, len = tableData.length; i < len; i++) {
+    if (!tableData[i].key || !tableData[i].body) {
+      res = false
+      break
+    }
+  }
+  return res
+}
 const saveMockFormEvent = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
   await formEl.validate((valid, fields) => {
     if (valid) {
-      console.log('submit!', {
-        ...form,
-        body: tableToObject()
-      })
+      if (tableData.length) {
+        if (tableDataRequired()) {
+          const fileName = form.url.replaceAll('/', '_')
+          const mockFile = {
+            ...form,
+            body: tableToObject(),
+            fileName,
+            filePath: `${fileName}.js`
+          }
+          Object.keys(mockFile.body).forEach(key => {
+            mockFile.body[key] = eval(mockFile.body[key])
+          })
+          socket.emit("updateMockFile", {
+            ...mockFile,
+            isEditor: props.isEditor
+          })
+        } else {
+          ElMessage.error('请将 body 表格中的内容填写完整')
+        }
+      } else {
+        ElMessage({
+          message: '请填写 body 表格内容',
+          type: 'warning',
+        })
+      }
     } else {
+      if (form.name && form.url && form.method && form.type) {
+        ElMessage.error('请检查 body 表格中的内容是否符合 JSON 格式')
+      }
       console.log('error submit!', fields)
     }
   })
 }
+function deleteMockFormEvent() {
+  socket.emit("deleteMockFile", form)
+}
+socket.on('mockFileExists', (mockFile: mockFormModel) => {
+  ElMessage.error(`${mockFile.name || mockFile.filePath}已存在`)
+})
+socket.on('addMockFileSuccess', (mockFile: mockFormModel) => {
+  ElMessage.success(`${mockFile.name || mockFile.filePath}创建成功`)
+})
+socket.on('updateMockFileSuccess', (mockFile: mockFormModel) => {
+  ElMessage.success(`${mockFile.name || mockFile.filePath}更新成功`)
+})
+socket.on('deleteMockFileSuccess', (mockFile: mockFormModel) => {
+  ElMessage.success(`${mockFile.name || mockFile.filePath}删除成功`)
+  socket.emit("getMocks")
+  if (route.query.mock === mockFile.fileName) {
+    router.replace({
+      path: '/mock',
+      query: { mock: store.state.mocksFiles[0].fileName }
+    })
+  }
+})
 </script>
 
 <style lang="scss" scoped>

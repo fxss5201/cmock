@@ -7,6 +7,7 @@ module.exports = {
   commandAdd: "新增mock文件命令",
   commandDelete: "删除mock文件命令",
   addUrl: "请输入接口路径：",
+  addName: "请输入接口名称：",
   addMockFileExistence: " mock文件已存在,可点击链接查看",
   addName: "请输入接口名称：",
   addMethod: "请选择接口方法：",

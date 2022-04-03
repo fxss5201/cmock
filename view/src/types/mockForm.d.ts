@@ -1,4 +1,6 @@
 export interface mockFormModel {
+  fileName: string
+  filePath: string
   name: string
   url: string
   method: string
@@ -14,4 +16,5 @@ export interface mockFormModel {
 export interface mockBodyModel {
   key: string
   body: string
+  disabled: boolean
 }

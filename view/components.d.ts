@@ -4,11 +4,13 @@
 
 declare module 'vue' {
   export interface GlobalComponents {
+    ElAlert: typeof import('element-plus/es')['ElAlert']
     ElAside: typeof import('element-plus/es')['ElAside']
     ElAutocomplete: typeof import('element-plus/es')['ElAutocomplete']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElConfigProvider: typeof import('element-plus/es')['ElConfigProvider']
     ElContainer: typeof import('element-plus/es')['ElContainer']
+    ElDialog: typeof import('element-plus/es')['ElDialog']
     ElFooter: typeof import('element-plus/es')['ElFooter']
     ElForm: typeof import('element-plus/es')['ElForm']
     ElFormItem: typeof import('element-plus/es')['ElFormItem']
@@ -28,6 +30,7 @@ declare module 'vue' {
     HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
     Loading: typeof import('element-plus/es')['ElLoadingDirective']
     MockForm: typeof import('./src/components/mockForm.vue')['default']
+    MockFormDialog: typeof import('./src/components/mockFormDialog.vue')['default']
     PageAside: typeof import('./src/components/pageAside.vue')['default']
     PageFooter: typeof import('./src/components/pageFooter.vue')['default']
     PageHeader: typeof import('./src/components/pageHeader.vue')['default']

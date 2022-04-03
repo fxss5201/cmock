@@ -7,6 +7,7 @@ module.exports = {
   commandAdd: "Add mock file command",
   commandDelete: "Delete mock file command",
   addUrl: "Please enter the interface path:",
+  addName: "Please enter the interface name:",
   addMockFileExistence:
     " Mock file already exists, you can click the link to view it",
   addName: "Please enter the interface name:",
