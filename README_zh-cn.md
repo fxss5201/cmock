@@ -20,6 +20,14 @@ npm run create
 npm run dev
 ```
 
+如果需要使用可视化操作界面，需要到当前目录的 `view` 目录下执行：
+
+```
+npm install
+
+npm run dev
+```
+
 ## 命令行
 
 在本项目下执行 `npm link` 创建 cmock 软链接。

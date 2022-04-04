@@ -22,6 +22,14 @@ npm run create
 npm run dev
 ```
 
+If you need to use the visual operation interface, you need to go to the 'view' directory of the current directory to execute:
+
+```
+npm install
+
+npm run dev
+```
+
 ## 命令行
 
 Execute `npm link` under this project to create cmock soft link.
