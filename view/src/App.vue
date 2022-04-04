@@ -8,7 +8,7 @@
         <el-aside width="200px" class="page-aside-style">
           <page-aside></page-aside>
         </el-aside>
-        <el-main class="page-main-style">
+        <el-main id="pageMain" class="page-main-style">
           <router-view></router-view>
         </el-main>
       </el-container>
@@ -20,13 +20,18 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref  } from 'vue'
+import { reactive, ref, watch  } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useStore } from './store'
 import zhCn from 'element-plus/es/locale/lang/zh-cn'
 import socket from './plugins/socket'
 
 const locale = reactive(zhCn)
+
+const router = useRouter()
+const route = useRoute()
 const store = useStore()
+
 const pageHeaderComponent = ref(null)
 socket.on("updateMocks", (mocksFiles) => {
   console.log(mocksFiles)
@@ -38,6 +43,18 @@ socket.on("updateMocks", (mocksFiles) => {
   store.commit('setMocksFiles', mocksFiles)
   pageHeaderComponent.value && pageHeaderComponent.value.closeEvent()
 })
+
+watch(
+  () => route.query,
+  (query) => {
+    const pageMain = document.querySelector('#pageMain')
+    if (pageMain) pageMain.scrollTop = 0
+  },
+  {
+    deep: true,
+    immediate: true
+  }
+)
 </script>
 
 <style lang="scss">
@@ -56,6 +73,7 @@ html, body {
   height: calc(100vh - 161px);
 }
 .page-main-style {
+  max-height: calc(100vh - 141px);
   border-left: 1px solid var(--el-border-color);
 }
 </style>

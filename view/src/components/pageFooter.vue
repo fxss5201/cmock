@@ -44,7 +44,7 @@ const curYear = new Date().getFullYear()
 
 <style lang="scss" scoped>
 .footer {
-  padding: 20px 0;
+  padding: 10px 0;
   text-align: center;
   line-height: 30px;
 }

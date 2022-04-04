@@ -9,9 +9,8 @@
   },
   "dependencies": {
     "@element-plus/icons-vue": "^1.1.4",
-    "@vueuse/core": "^8.2.3",
-    "@vueuse/integrations": "^8.2.4",
     "axios": "^0.26.1",
+    "clipboard": "^2.0.10",
     "dayjs": "^1.11.0",
     "element-plus": "^2.1.7",
     "qs": "^6.10.3",

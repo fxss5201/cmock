@@ -1,24 +1,39 @@
 <template>
   <el-form ref="ruleFormRef" :model="form" :rules="rules" label-width="120px" v-loading="loading">
     <el-form-item prop="name" label="接口名称">
-      <el-input v-model="form.name" placeholder="请输入接口名称" clearable />
+      <el-input v-model="form.name" placeholder="请输入接口名称" clearable>
+        <template v-if="isEditor" #append>
+          <el-button class="copyBtn" :icon="CopyDocument" :data-clipboard-text="form.name" />
+        </template>
+      </el-input>
     </el-form-item>
     <el-form-item prop="url" label="接口 url">
-      <el-input v-model="form.url" placeholder="请输入接口 url" clearable />
+      <el-input v-model="form.url" placeholder="请输入接口 url" clearable>
+        <template v-if="isEditor" #append>
+          <el-button class="copyBtn" :icon="CopyDocument" :data-clipboard-text="form.url" />
+        </template>
+      </el-input>
     </el-form-item>
     <el-form-item prop="method" label="接口方法">
       <el-select v-model="form.method" placeholder="请选择接口方法" clearable @change="methodChangeEvent">
         <el-option v-for="item in methodList" :key="item" :label="item" :value="item" />
       </el-select>
+      <el-button v-if="isEditor" class="copyBtn mgl15" :icon="CopyDocument" :data-clipboard-text="form.method" />
     </el-form-item>
     <el-form-item prop="type" label="接口 type">
-      <el-input v-model="form.type" placeholder="请输入接口 type" clearable />
+      <el-input v-model="form.type" placeholder="请输入接口 type" clearable>
+        <template v-if="isEditor" #append>
+          <el-button class="copyBtn" :icon="CopyDocument" :data-clipboard-text="form.type" />
+        </template>
+      </el-input>
     </el-form-item>
     <el-form-item prop="timeout" label="接口 timeout">
       <el-input-number v-model="form.timeout" :step="10" placeholder="请输入接口 timeout" clearable />
+      <el-button v-if="isEditor" class="copyBtn mgl15" :icon="CopyDocument" :data-clipboard-text="form.timeout" />
     </el-form-item>
     <el-form-item prop="isUseMockjs" label="是否使用mockjs">
       <el-switch v-model="form.isUseMockjs" @change="isUseMockjsChangeEvent" />
+      <el-button v-if="isEditor" class="copyBtn mgl15" :icon="CopyDocument" :data-clipboard-text="form.isUseMockjs" />
     </el-form-item>
     <el-form-item prop="body" label="body">
       <el-alert title="表格中的 key 和 body 需要使用 JSON.parse ，所以请使用严格 JSON 格式" show-icon :closable="false" type="warning" />
@@ -31,11 +46,13 @@
         <el-table-column prop="key" label="参数" width="240">
           <template #default="scope">
             <el-input v-model="scope.row.key" :rows="2" type="textarea" :autosize="{ minRows: 2, maxRows: 6 }" :disabled="scope.row.disabled" :placeholder="`请输入参数，例如${keyPlaceholder}`" />
+            <el-button v-if="isEditor" class="copyBtn mgt12" :icon="CopyDocument" :data-clipboard-text="scope.row.key" />
           </template>
         </el-table-column>
         <el-table-column prop="body" label="返回数据">
           <template #default="scope">
             <el-input v-model="scope.row.body" :rows="2" type="textarea" :autosize="{ minRows: 2, maxRows: 6 }" placeholder="请输入返回数据" />
+            <el-button v-if="isEditor" class="copyBtn mgt12" :icon="CopyDocument" :data-clipboard-text="scope.row.body" />
           </template>
         </el-table-column>
       </el-table>
@@ -51,15 +68,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, watch, PropType } from 'vue'
+import { ref, reactive, computed, watch, PropType, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { Delete, Plus } from '@element-plus/icons-vue'
+import { Delete, Plus, CopyDocument } from '@element-plus/icons-vue'
 import type { FormInstance } from 'element-plus'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage } from 'element-plus'
 import { mockFormModel, mockBodyModel } from './../types'
 import socket from './../plugins/socket'
 import { useStore } from './../store'
 import { propKey } from 'element-plus/es/utils'
+import Clipboard from 'clipboard'
 
 const props = defineProps({
   isEditor: {
@@ -70,6 +88,13 @@ const props = defineProps({
     type: Object as PropType<mockFormModel>,
     default: () => {}
   }
+})
+
+onMounted(() => {
+  const clipboard = new Clipboard('.copyBtn')
+  clipboard.on('success', function(e) {
+    ElMessage.success('复制成功')
+  })
 })
 
 const router = useRouter()
@@ -163,14 +188,19 @@ function methodChangeEvent(val: any) {
 }
 function isUseMockjsChangeEvent(val: any) {
   if (val) {
-    tableData.unshift({
-      key: 'mockTemplate',
-      body: '',
-      disabled: true
-    })
+    let index = tableData.findIndex(x => x.key === 'mockTemplate')
+    if (index === -1) {
+      tableData.unshift({
+        key: 'mockTemplate',
+        body: '',
+        disabled: true
+      })
+    }
   } else {
-    let index = tableData.findIndex(x => x.disabled)
-    tableData.splice(index, 1)
+    let index = tableData.findIndex(x => x.key === 'mockTemplate')
+    if (index > -1) {
+      tableData.splice(index, 1)
+    }
   }
 }
 function keyToBodyKey(key: string) {

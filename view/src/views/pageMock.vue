@@ -1,14 +1,14 @@
 <template>
   <div class="page-mock">
-    <h2 class="mock-title">{{ mockFileContent.filePath }}</h2>
+    <h2 class="mock-title">{{ mockFileContent.name === '$name' ? mockFileContent.filePath : mockFileContent.name }}</h2>
     <div style="margin-bottom: 15px;">更新时间：{{ mockFileContent.updateTime }}</div>
     <mock-form :isEditor="true" :mockContent="mockFileContent"></mock-form>
     <el-divider border-style="dashed" />
     <h2 class="mock-title">尝试接口请求</h2>
+    <div style="margin-bottom: 15px;">调整完接口需要先更新接口再尝试接口请求。</div>
     <el-form
       ref="ruleFormRef"
       :model="ruleForm"
-      :rules="rules"
       label-width="120px"
     >
       <el-form-item prop="bodyKey" label="请输入请求参数">
@@ -54,9 +54,21 @@ const mockFileContent = computed((): mockFormModel | undefined => {
   return res as mockFormModel | undefined
 })
 
+const ruleFormRef = ref<FormInstance>()
+const ruleForm = reactive({
+  bodyKey: '',
+  responseType: 'json',
+  response: ''
+})
+
 watch(
   () => route.query,
   (query) => {
+    Object.assign(ruleForm, {
+      bodyKey: '',
+      responseType: 'json',
+      response: ''
+    })
     if (route.path === '/mock' && !query.mock) {
       ElMessage.error('链接错误，自动跳转首页')
       router.replace('/home')
@@ -68,39 +80,28 @@ watch(
   }
 )
 
-const ruleFormRef = ref<FormInstance>()
-const ruleForm = reactive({
-  bodyKey: '',
-  responseType: 'json',
-  response: ''
-})
-const rules = reactive({
-  bodyKey: [
-    { required: true, message: '请输入请求参数', trigger: 'blur' },
-    { required: true, message: '请输入请求参数', trigger: 'change' }
-  ]
-})
-
 let axiosIsLoading = ref(false)
-const doHttpEvent = async (formEl: FormInstance | undefined) => {
+const doHttpEvent = (formEl: FormInstance | undefined) => {
   if (!formEl) return
-  await formEl.validate((valid, fields) => {
-    if (valid) {
-      let axiosConfig: AxiosRequestConfig = {
-        url: mockFileContent.value?.url,
-        method: mockFileContent.value?.method,
-        responseType: ruleForm.responseType
-      }
-      if (axiosConfig.method?.toLowerCase() === 'get') {
-        axiosConfig.params = qs.parse(ruleForm.bodyKey)
-      } else {
-        axiosConfig.data = JSON.parse(ruleForm.bodyKey)
-      }
-      doHttpFn(axiosConfig)
-    } else {
-      console.log('error submit!', fields)
-    }
-  })
+  if (!mockFileContent.value?.isUseMockjs && !ruleForm.bodyKey) {
+    ElMessage.error('请输入请求参数')
+    return
+  }
+  if (!ruleForm.responseType) {
+    ElMessage.error('请输入 axios responseType')
+    return
+  }
+  let axiosConfig: AxiosRequestConfig = {
+    url: mockFileContent.value?.url,
+    method: mockFileContent.value?.method,
+    responseType: ruleForm.responseType
+  }
+  if (axiosConfig.method?.toLowerCase() === 'get') {
+    axiosConfig.params = qs.parse(ruleForm.bodyKey)
+  } else {
+    axiosConfig.data = JSON.parse(ruleForm.bodyKey)
+  }
+  doHttpFn(axiosConfig)
 }
 async function doHttpFn(axiosConfig: AxiosRequestConfig) {
   axiosIsLoading.value = true
