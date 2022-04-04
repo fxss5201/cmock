@@ -26,9 +26,10 @@ export default defineConfig({
   server: {
     port: 8890,
     proxy: {
-      '/api': {
+      '/mock': {
         target: 'http://localhost:8888',
-        changeOrigin: true
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/mock/, '')
       }
     }
   },

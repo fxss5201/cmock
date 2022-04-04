@@ -4,9 +4,9 @@ module.exports = {
 	"method": "get",
 	"type": "application/json, text/plain, */*",
 	"createTime": "2022-01-25 13:51:32",
-	"updateTime": "2022-04-03 10:55:58",
+	"updateTime": "2022-04-04 10:12:02",
 	"isUseMockjs": false,
-	"timeout": 0,
+	"timeout": 1010,
 	"bodyKey": {},
 	"body": {
 		"mockTemplate": {

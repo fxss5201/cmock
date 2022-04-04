@@ -246,16 +246,16 @@ function deleteMockFormEvent() {
   socket.emit("deleteMockFile", form)
 }
 socket.on('mockFileExists', (mockFile: mockFormModel) => {
-  ElMessage.error(`${mockFile.name || mockFile.filePath}已存在`)
+  ElMessage.error(`${mockFile.name === '$name' ? mockFile.filePath : mockFile.name}已存在`)
 })
 socket.on('addMockFileSuccess', (mockFile: mockFormModel) => {
-  ElMessage.success(`${mockFile.name || mockFile.filePath}创建成功`)
+  ElMessage.success(`${mockFile.name === '$name' ? mockFile.filePath : mockFile.name}创建成功`)
 })
 socket.on('updateMockFileSuccess', (mockFile: mockFormModel) => {
-  ElMessage.success(`${mockFile.name || mockFile.filePath}更新成功`)
+  ElMessage.success(`${mockFile.name === '$name' ? mockFile.filePath : mockFile.name}更新成功`)
 })
 socket.on('deleteMockFileSuccess', (mockFile: mockFormModel) => {
-  ElMessage.success(`${mockFile.name || mockFile.filePath}删除成功`)
+  ElMessage.success(`${mockFile.name === '$name' ? mockFile.filePath : mockFile.name}删除成功`)
   socket.emit("getMocks")
   if (route.query.mock === mockFile.fileName) {
     router.replace({
