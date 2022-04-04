@@ -25,6 +25,7 @@ export default defineConfig({
   },
   server: {
     port: 8890,
+    open: '/',
     proxy: {
       '/mock': {
         target: 'http://localhost:8888',
